@@ -55,6 +55,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" translate="no" className="notranslate" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof globalThis!=="undefined"&&!globalThis.__name){globalThis.__name=function(t,v){try{return Object.defineProperty(t,"name",{value:v,configurable:true})}catch(e){return t}}};if(typeof window!=="undefined"&&!window.__name){window.__name=globalThis.__name};`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${amiri.variable} antialiased font-sans`}
       >
