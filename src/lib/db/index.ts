@@ -1,13 +1,15 @@
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { cache } from 'react';
 
 const globalForDb = globalThis as unknown as {
   _postgresClient?: postgres.Sql;
   _drizzleDb?: any;
 };
 
-export const getDb = () => {
+export const getDb = cache(() => {
   // Selama fase build produksi Next.js (prerender static pages)
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return new Proxy({} as any, {
@@ -20,11 +22,20 @@ export const getDb = () => {
     });
   }
 
-  if (globalForDb._drizzleDb) {
-    return globalForDb._drizzleDb;
-  }
+  let connectionString = process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+  let isHyperdrive = false;
 
-  const connectionString = process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+  try {
+    const cf = getCloudflareContext();
+    if ((cf?.env as any)?.HYPERDRIVE?.connectionString) {
+      connectionString = (cf.env as any).HYPERDRIVE.connectionString;
+      isHyperdrive = true;
+    } else if ((cf?.env as any)?.DATABASE_URL) {
+      connectionString = (cf.env as any).DATABASE_URL;
+    }
+  } catch {
+    // Di luar runtime Cloudflare Workers (misal: development lokal dengan Node.js)
+  }
 
   if (!connectionString) {
     // Return proxy with helpful warning if DATABASE_URL is not set yet
@@ -41,14 +52,32 @@ export const getDb = () => {
   }
 
   try {
-    // Ultra-low latency Postgres.js connection pooler
-    // prepare: false diperlukan untuk Supabase transaction pooler (port 6543 / pgbouncer)
+    if (isHyperdrive) {
+      // Koneksi via Cloudflare Hyperdrive:
+      // Hyperdrive mengelola pooling dan SSL ke Supabase secara native di edge Cloudflare
+      const client = postgres(connectionString, {
+        prepare: false,
+        max: 5,
+        idle_timeout: 20,
+        connect_timeout: 10,
+        fetch_types: false,
+      });
+
+      return drizzle(client, { schema });
+    }
+
+    // Koneksi development lokal atau fallback langsung
+    if (globalForDb._drizzleDb) {
+      return globalForDb._drizzleDb;
+    }
+
     const client = globalForDb._postgresClient ?? postgres(connectionString, {
       prepare: false,
       max: 10,
       idle_timeout: 30,
       connect_timeout: 15,
       ssl: { rejectUnauthorized: false },
+      fetch_types: false,
     });
 
     if (process.env.NODE_ENV !== 'production') {
@@ -65,6 +94,14 @@ export const getDb = () => {
     console.error('Gagal menghubungkan ke Supabase PostgreSQL:', error);
     throw error;
   }
-};
+});
 
-export const db = getDb();
+// Proxy dinamis agar tidak melakukan inisialisasi koneksi soket di level modul saat cold start Cloudflare Workers
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(_, prop) {
+    const instance = getDb();
+    const val = (instance as any)[prop];
+    return typeof val === 'function' ? val.bind(instance) : val;
+  }
+});
+

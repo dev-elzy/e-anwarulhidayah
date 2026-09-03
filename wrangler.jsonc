@@ -10,6 +10,13 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "c63805c58ef9480295346cd7f0feaaee",
+      "localConnectionString": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+    }
+  ],
   "routes": [
     {
       "pattern": "anwarulhidayah.develzy.my.id",
