@@ -10,22 +10,22 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  "d1_databases": [
+  "routes": [
     {
-      "binding": "DB",
-      "database_name": "db-anwarulhidayah",
-      "database_id": "eb2ab145-2e1e-4cb1-81ae-ffe45d371ee8",
-      "migrations_dir": "./migrations"
+      "pattern": "anwarulhidayah.develzy.my.id",
+      "custom_domain": true
     }
   ],
-  // ─── SECRETS (jangan taruh nilainya di sini!) ─────────────────────────────
-  // Set di production via CLI:
-  //   wrangler secret put AUTH_SECRET
-  //   wrangler secret put CLOUDINARY_CLOUD_NAME
-  //   wrangler secret put CLOUDINARY_API_KEY
-  //   wrangler secret put CLOUDINARY_API_SECRET
-  //   wrangler secret put CRON_SECRET
-  // ──────────────────────────────────────────────────────────────────────────
+  "vars": {
+    "DATABASE_URL": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true",
+    "DIRECT_URL": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres",
+    "SUPABASE_URL": "https://ylmddkafujvmilaticrm.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://ylmddkafujvmilaticrm.supabase.co",
+    "AUTH_SECRET": "e-anwarulhidayah-super-secret-key-development-2026-local",
+    "NEXTAUTH_SECRET": "e-anwarulhidayah-super-secret-key-development-2026-local",
+    "NEXTAUTH_URL": "https://anwarulhidayah.develzy.my.id",
+    "CRON_SECRET": "cron-local-secret-key-2026"
+  },
   "observability": {
     "enabled": false,
     "head_sampling_rate": 1,
@@ -34,11 +34,6 @@
       "head_sampling_rate": 1,
       "persist": true,
       "invocation_logs": true
-    },
-    "traces": {
-      "enabled": false,
-      "persist": true,
-      "head_sampling_rate": 1
     }
   }
 }
