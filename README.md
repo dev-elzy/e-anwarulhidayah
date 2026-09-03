@@ -30,21 +30,12 @@ To learn more about Next.js, take a look at the following resources:
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 ## Deploy on Cloudflare Workers
 
-Aplikasi ini di-deploy ke **Cloudflare Workers** menggunakan **OpenNext** dan **Wrangler**. Proses deployment dilakukan secara manual melalui terminal (tidak menggunakan GitHub Actions secara otomatis).
+Aplikasi ini di-deploy ke **Cloudflare Workers** menggunakan **@opennextjs/cloudflare** dan **Wrangler** dengan domain resmi [https://anwarulhidayah.develzy.my.id](https://anwarulhidayah.develzy.my.id).
 
-### Perintah Build & Deploy:
-
-```bash
-# 1. Build project menggunakan OpenNext untuk Cloudflare Workers
-npm run build:cloudflare
-
-# 2. Deploy bundle ke Cloudflare Workers menggunakan Wrangler
-npm run deploy
-```
-
-*(Catatan Windows: Jika terdapat kendala Execution Policy pada PowerShell, gunakan `cmd.exe /c "npm run build:cloudflare"` dan `cmd.exe /c "npm run deploy"`).*
-
----
+### CI/CD Otomatis Cloudflare:
+- **Build command**: `npm run build:cloudflare`
+- **Deploy command**: `npx wrangler deploy`
+- Setiap `git push` ke branch `main` akan otomatis memicu build dan deploy ke Cloudflare Workers.
 
 ## Deploy on Vercel
 
