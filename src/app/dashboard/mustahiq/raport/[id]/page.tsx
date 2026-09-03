@@ -290,7 +290,11 @@ export default async function RaportDetailPage({ params, searchParams }: PagePro
   const predikatBayan = getPredikatBayan(averageGrade, classRank);
   const nilaiAkhlaqHuruf = getAkhlaqHuruf(averageGrade);
 
-  const backUrl = session.user.role === "WALI_SANTRI" ? "/dashboard/wali" : "/dashboard/mustahiq/nilai";
+  const backUrl = session.user.role === "WALI_SANTRI" 
+    ? "/dashboard/wali" 
+    : (session.user.role === "OPERATOR" || session.user.role === "SUPER_ADMIN")
+    ? "/dashboard/operator/arsip"
+    : "/dashboard/mustahiq/raport";
 
   const raportData = {
     student: {

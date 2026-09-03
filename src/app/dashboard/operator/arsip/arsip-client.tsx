@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Printer, Search, Archive, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { apiGet } from "@/lib/api-client";
+import Link from "next/link";
 
 interface ArsipClientProps {
   kelasList: any[];
@@ -206,10 +207,8 @@ export function ArsipClient({
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-1.5 flex-nowrap">
                             {/* 1. View / Pratinjau Raport di Layar */}
-                            <a 
-                              href={`/dashboard/mustahiq/raport/${s.id}?semesterId=${selectedSemesterId}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
+                            <Link 
+                              href={`/dashboard/mustahiq/raport/${s.id}?semesterId=${selectedSemesterId}`}
                             >
                               <Button 
                                 variant="outline" 
@@ -219,7 +218,7 @@ export function ArsipClient({
                               >
                                 <Eye className="h-3.5 w-3.5" /> Lihat
                               </Button>
-                            </a>
+                            </Link>
 
                             {/* 2. PDF Nilai (Transkrip) */}
                             <a 

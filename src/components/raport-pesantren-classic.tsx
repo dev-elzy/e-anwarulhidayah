@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Printer, ArrowLeft, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -51,6 +51,18 @@ export interface ClassicRaportProps {
 
 export function RaportPesantrenClassic({ data, backUrl = "/dashboard/mustahiq/nilai" }: ClassicRaportProps) {
   const [useArabicNumbers, setUseArabicNumbers] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("print") === "true" || params.get("download") === "true") {
+        const timer = setTimeout(() => {
+          window.print();
+        }, 600);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
 
   const formatNumber = (num: number | string | null | undefined) => {
     if (num === null || num === undefined || num === "") return "-";
