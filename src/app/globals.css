@@ -1,0 +1,438 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --font-arabic: var(--font-amiri);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Dynamic Slate Inversion */
+  --color-slate-50: var(--slate-50);
+  --color-slate-100: var(--slate-100);
+  --color-slate-200: var(--slate-200);
+  --color-slate-300: var(--slate-300);
+  --color-slate-400: var(--slate-400);
+  --color-slate-500: var(--slate-500);
+  --color-slate-600: var(--slate-600);
+  --color-slate-700: var(--slate-700);
+  --color-slate-800: var(--slate-800);
+  --color-slate-900: var(--slate-900);
+  --color-slate-950: var(--slate-950);
+
+  /* Force Hex colors for other palettes used in the app to prevent oklab crashing html2canvas */
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce3;
+  --color-green-400: #4ade80;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+}
+
+:root {
+  /* 2026 SaaS: Harmonized Islamic Modern Corporate Palette (Light Mode) */
+  --background: hsl(210, 25%, 98%);
+  --foreground: hsl(215, 25%, 15%);
+  
+  --card: #ffffff;
+  --card-foreground: hsl(215, 25%, 15%);
+  
+  /* Glass overlays for modals/palette */
+  --popover: rgba(255, 255, 255, 0.95);
+  --popover-foreground: hsl(215, 25%, 15%);
+  
+  /* Primary: Biru Anwarul (#1e88e5) */
+  --primary: #1e88e5;
+  --primary-foreground: #ffffff;
+  
+  --secondary: hsl(215, 20%, 95%);
+  --secondary-foreground: #1e88e5;
+  
+  --muted: hsl(215, 20%, 94%);
+  --muted-foreground: hsl(215, 15%, 48%);
+  
+  /* Accent: Emas Anwarul (#d97706 / #d4af37) */
+  --accent: #d97706;
+  --accent-foreground: #ffffff;
+  
+  --destructive: #ef4444;
+  
+  --border: hsl(215, 20%, 90%);
+  --input: hsl(215, 20%, 90%);
+  --ring: rgba(30, 136, 229, 0.35);
+  
+  --radius: 0.85rem;
+
+  /* Slate colors for Light Mode */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+}
+
+.dark {
+  /* 2026 SaaS: Deep Sapphire Slate Palette (Dark Mode) */
+  --background: hsl(222, 47%, 7%);
+  --foreground: hsl(215, 20%, 95%);
+  
+  --card: hsl(222, 40%, 11%);
+  --card-foreground: hsl(215, 20%, 95%);
+  
+  --popover: rgba(16, 23, 42, 0.95);
+  --popover-foreground: hsl(215, 20%, 95%);
+  
+  --primary: #38bdf8;
+  --primary-foreground: #082f49;
+  
+  --secondary: hsl(222, 35%, 15%);
+  --secondary-foreground: #38bdf8;
+  
+  --muted: hsl(222, 35%, 14%);
+  --muted-foreground: hsl(215, 15%, 62%);
+  
+  --accent: #fbbf24;
+  --accent-foreground: #451a03;
+  
+  --destructive: #f87171;
+  
+  --border: hsl(222, 30%, 18%);
+  --input: hsl(222, 30%, 18%);
+  --ring: rgba(56, 189, 248, 0.4);
+
+  /* Slate color inversion for Dark Mode */
+  --slate-50: #020617;
+  --slate-100: #0f172a;
+  --slate-200: #1e293b;
+  --slate-300: #334155;
+  --slate-400: #475569;
+  --slate-500: #94a3b8;
+  --slate-600: #cbd5e1;
+  --slate-700: #e2e8f0;
+  --slate-800: #f1f5f9;
+  --slate-900: #f8fafc;
+  --slate-950: #ffffff;
+}
+
+@layer utilities {
+  /* Harmonized Glassmorphism */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+  }
+  
+  .dark .glass-panel {
+    background: rgba(16, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-panel-dark {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 40px 0 rgba(30, 136, 229, 0.08);
+  }
+
+  .dark .glass-panel-dark {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 45px 0 rgba(0, 0, 0, 0.5);
+  }
+  
+  .text-glow-gold {
+    text-shadow: 0 0 16px rgba(217, 119, 6, 0.2);
+  }
+
+  .dark .text-glow-gold {
+    text-shadow: 0 0 16px rgba(251, 191, 36, 0.35);
+  }
+  
+  .bg-gold-gradient {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .bg-blue-gradient {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  }
+
+  /* Dashboard Visual Density (Top Banner) */
+  .page-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #f59e0b 100%);
+  }
+
+  @media (min-width: 768px) {
+    .page-banner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 1.75rem;
+    }
+  }
+
+  /* Page title — responsif */
+  .page-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  @media (min-width: 768px) {
+    .page-title {
+      font-size: 1.625rem;
+    }
+  }
+
+  /* Stat card value */
+  .stat-value {
+    font-size: 1.625rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    word-break: break-all;
+  }
+
+  @media (min-width: 768px) {
+    .stat-value {
+      font-size: 2rem;
+    }
+  }
+
+  /* Animasi micro-interactions */
+  .transition-saas {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .hover-lift {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Automatic Dark Mode Fallbacks for Translucent White Elements */
+  .dark .bg-white\/5 { background-color: rgba(15, 23, 42, 0.1); }
+  .dark .bg-white\/10 { background-color: rgba(15, 23, 42, 0.25); }
+  .dark .bg-white\/15 { background-color: rgba(15, 23, 42, 0.3); }
+  .dark .bg-white\/20 { background-color: rgba(15, 23, 42, 0.35); }
+  .dark .bg-white\/30 { background-color: rgba(0, 0, 0, 0.2); }
+  .dark .bg-white\/40 { background-color: rgba(15, 23, 42, 0.5); }
+  .dark .bg-white\/50 { background-color: rgba(15, 23, 42, 0.6); }
+  .dark .bg-white\/70 { background-color: rgba(15, 23, 42, 0.75); }
+  .dark .bg-white\/80 { background-color: rgba(15, 23, 42, 0.8); }
+  .dark .bg-white\/90 { background-color: rgba(15, 23, 42, 0.9); }
+  .dark .bg-white\/95 { background-color: rgba(15, 23, 42, 0.95); }
+
+  .dark .border-white\/5 { border-color: rgba(255, 255, 255, 0.02); }
+  .dark .border-white\/10 { border-color: rgba(255, 255, 255, 0.04); }
+  .dark .border-white\/15 { border-color: rgba(255, 255, 255, 0.05); }
+  .dark .border-white\/20 { border-color: rgba(255, 255, 255, 0.06); }
+  .dark .border-white\/30 { border-color: rgba(255, 255, 255, 0.07); }
+  .dark .border-white\/40 { border-color: rgba(255, 255, 255, 0.08); }
+  .dark .hover\:bg-white\/10:hover { background-color: rgba(255, 255, 255, 0.04); }
+  .dark .hover\:bg-white\/20:hover { background-color: rgba(255, 255, 255, 0.06); }
+  .dark .hover\:bg-white\/30:hover { background-color: rgba(255, 255, 255, 0.08); }
+  .dark .hover\:bg-white\/50:hover { background-color: rgba(255, 255, 255, 0.12); }
+
+
+  /* Force light-mode slate variables on printable pages in dark mode to keep text/borders readable on white container background */
+  .dark .print-page, .dark .print-page * {
+    --slate-50: #f8fafc !important;
+    --slate-100: #f1f5f9 !important;
+    --slate-200: #e2e8f0 !important;
+    --slate-300: #cbd5e1 !important;
+    --slate-400: #94a3b8 !important;
+    --slate-500: #64748b !important;
+    --slate-600: #475569 !important;
+    --slate-700: #334155 !important;
+    --slate-800: #1e293b !important;
+    --slate-900: #0f172a !important;
+    --slate-950: #020617 !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/40;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+
+  html, body {
+    overscroll-behavior: none; /* Disable pull-to-refresh and rubber-band effect */
+    user-select: none; /* Disable text selection globally */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none; /* Disable native long-press menus on iOS */
+    -webkit-tap-highlight-color: transparent; /* Disable tap highlight color on mobile */
+  }
+
+  body {
+    @apply bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-primary font-sans;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(33, 150, 243, 0.015) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.015) 0px, transparent 50%);
+    background-attachment: fixed;
+    letter-spacing: -0.011em;
+  }
+
+  .dark body {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(33, 150, 243, 0.025) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.025) 0px, transparent 50%);
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Allow text selection in inputs, textareas, code blocks and rapors */
+  input, textarea, [contenteditable="true"], pre, code, .print-card, table td {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+  }
+
+  /* Smooth Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  .font-arabic {
+    font-family: var(--font-amiri), "Amiri", "Traditional Arabic", "Scheherazade New", serif;
+  }
+
+  /* Classical Pesantren Raport Print Styles */
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .raport-classic-page {
+      box-shadow: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm 8mm 10mm;
+    }
+  }
+}

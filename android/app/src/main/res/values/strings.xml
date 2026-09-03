@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">e-AnwarulHidayah</string>
+    <string name="title_activity_main">e-AnwarulHidayah</string>
+    <string name="package_name">com.develzy.anwarulhidayah</string>
+    <string name="custom_url_scheme">com.develzy.anwarulhidayah</string>
+</resources>

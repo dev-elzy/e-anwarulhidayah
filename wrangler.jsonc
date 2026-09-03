@@ -1,0 +1,44 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "e-anwarulhidayah",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-11-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "db-anwarulhidayah",
+      "database_id": "eb2ab145-2e1e-4cb1-81ae-ffe45d371ee8",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  // ─── SECRETS (jangan taruh nilainya di sini!) ─────────────────────────────
+  // Set di production via CLI:
+  //   wrangler secret put AUTH_SECRET
+  //   wrangler secret put CLOUDINARY_CLOUD_NAME
+  //   wrangler secret put CLOUDINARY_API_KEY
+  //   wrangler secret put CLOUDINARY_API_SECRET
+  //   wrangler secret put CRON_SECRET
+  // ──────────────────────────────────────────────────────────────────────────
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  }
+}
