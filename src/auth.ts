@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { verifyPassword } from "@/utils/crypto";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -21,12 +21,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const db = getDb();
           if (!db) return null;
-          const userList = await db.select().from(users).where(eq(users.username, credentials.username as string)).limit(1);
+          const cleanUsername = String(credentials.username).trim();
+          const cleanPassword = String(credentials.password).trim();
+
+          const userList = await db.select().from(users).where(
+            sql`LOWER(${users.username}) = LOWER(${cleanUsername})`
+          ).limit(1);
+
           const foundUser = userList[0];
           
           if (!foundUser || !foundUser.active) return null;
           
-          const passwordMatches = await verifyPassword(credentials.password as string, foundUser.passwordHash);
+          const passwordMatches = await verifyPassword(cleanPassword, foundUser.passwordHash);
           if (!passwordMatches) return null;
           
           return {

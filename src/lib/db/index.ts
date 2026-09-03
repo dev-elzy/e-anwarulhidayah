@@ -48,7 +48,7 @@ export const getDb = () => {
       max: 10,
       idle_timeout: 30,
       connect_timeout: 15,
-      ssl: 'require',
+      ssl: { rejectUnauthorized: false },
     });
 
     if (process.env.NODE_ENV !== 'production') {
