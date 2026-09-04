@@ -113,7 +113,7 @@ export function RaportPesantrenClassic({ data, backUrl = "/dashboard/mustahiq/ni
         style={{ color: "#111827", backgroundColor: "#ffffff" }}
       >
         {/* Double Outline Border Frame */}
-        <div className="border-[2px] border-slate-900 p-1 h-full flex flex-col justify-between">
+        <div className="border-2 border-slate-900 p-1 h-full flex flex-col justify-between">
           <div className="border border-slate-900 p-5 md:p-6 h-full flex flex-col justify-between">
             
             {/* Header / Kop Raport */}
@@ -140,7 +140,7 @@ export function RaportPesantrenClassic({ data, backUrl = "/dashboard/mustahiq/ni
                 <p className="font-arabic text-sm text-slate-700 mt-0.5" dir="rtl">
                   {data.alamatPondok}
                 </p>
-                <div className="w-48 h-[1px] bg-slate-900 my-1.5 mx-auto" />
+                <div className="w-48 h-px bg-slate-900 my-1.5 mx-auto" />
                 <p className="font-arabic text-xs font-semibold text-slate-800" dir="rtl">
                   سنة : {useArabicNumbers ? toArabicDigits(data.hijriYear) : data.hijriYear} هـ / {useArabicNumbers ? toArabicDigits(data.academicYearName) : data.academicYearName} م
                 </p>

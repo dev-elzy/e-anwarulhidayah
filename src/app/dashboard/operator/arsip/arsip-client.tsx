@@ -105,7 +105,7 @@ export function ArsipClient({
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Class Select */}
           <Select value={selectedKelasId} onValueChange={(val) => setSelectedKelasId(val || "")}>
-            <SelectTrigger className="h-9 px-3 rounded-lg bg-background/80 border-border/60 text-xs font-semibold w-auto min-w-[140px]">
+            <SelectTrigger className="h-9 px-3 rounded-lg bg-background/80 border-border/60 text-xs font-semibold w-auto min-w-35">
               <SelectValue placeholder="Pilih Kelas">
                 {kelasList.find(k => k.id === selectedKelasId)?.namaKelas || "Pilih Kelas"}
               </SelectValue>
@@ -119,7 +119,7 @@ export function ArsipClient({
 
           {/* Semester Select */}
           <Select value={selectedSemesterId} onValueChange={(val) => setSelectedSemesterId(val || "")}>
-            <SelectTrigger className="h-9 px-3 rounded-lg bg-background/80 border-border/60 text-xs font-semibold w-auto min-w-[160px]">
+            <SelectTrigger className="h-9 px-3 rounded-lg bg-background/80 border-border/60 text-xs font-semibold w-auto min-w-40">
               <SelectValue placeholder="Pilih Semester">
                 {semesterList.find(s => s.id === selectedSemesterId)?.nama ? `Semester ${semesterList.find(s => s.id === selectedSemesterId)?.nama}` : "Pilih Semester"}
               </SelectValue>
@@ -142,7 +142,7 @@ export function ArsipClient({
             <Table>
               <TableHeader className="bg-white/50 border-b border-muted/10">
                 <TableRow>
-                  <TableHead className="font-bold w-[60px]">Foto</TableHead>
+                  <TableHead className="font-bold w-15">Foto</TableHead>
                   <TableHead className="font-bold">NIS</TableHead>
                   <TableHead className="font-bold">Nama Lengkap</TableHead>
                   <TableHead className="font-bold">Gender</TableHead>
