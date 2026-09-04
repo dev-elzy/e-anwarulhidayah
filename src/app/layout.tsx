@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Amiri } from "next/font/google";
 import "./globals.css";
@@ -58,6 +59,9 @@ export default function RootLayout({
   return (
     <html lang="id" translate="no" className="notranslate" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
         <script
           dangerouslySetInnerHTML={{
             __html: `if(typeof globalThis!=="undefined"&&!globalThis.__name){globalThis.__name=function(t,v){try{return Object.defineProperty(t,"name",{value:v,configurable:true})}catch(e){return t}}};if(typeof window!=="undefined"&&!window.__name){window.__name=globalThis.__name};`,

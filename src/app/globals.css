@@ -411,33 +411,36 @@
   }
 
   .amiri-regular {
-    font-family: "Amiri", var(--font-amiri), serif;
+    font-family: "Amiri", var(--font-amiri), "Traditional Arabic", serif !important;
     font-weight: 400;
     font-style: normal;
   }
 
   .amiri-bold {
-    font-family: "Amiri", var(--font-amiri), serif;
+    font-family: "Amiri", var(--font-amiri), "Traditional Arabic", serif !important;
     font-weight: 700;
     font-style: normal;
   }
 
   .amiri-regular-italic {
-    font-family: "Amiri", var(--font-amiri), serif;
+    font-family: "Amiri", var(--font-amiri), "Traditional Arabic", serif !important;
     font-weight: 400;
     font-style: italic;
   }
 
   .amiri-bold-italic {
-    font-family: "Amiri", var(--font-amiri), serif;
+    font-family: "Amiri", var(--font-amiri), "Traditional Arabic", serif !important;
     font-weight: 700;
     font-style: italic;
   }
 
   .font-arabic,
+  .font-amiri,
   [dir="rtl"],
-  :lang(ar) {
-    font-family: "Amiri", var(--font-amiri), serif;
+  [dir="rtl"] *,
+  :lang(ar),
+  .arabic-text {
+    font-family: "Amiri", var(--font-amiri), "Traditional Arabic", serif !important;
   }
 
   /* Classical Pesantren Raport Print Styles */

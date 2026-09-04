@@ -120,12 +120,12 @@ export function RaportPesantrenClassic({ data, backUrl = "/dashboard/mustahiq/ni
             <div>
               <div className="text-center flex flex-col items-center">
                 <img
-                  src={data.logoUrl || "/icon.png"}
+                  src={(!data.logoUrl || data.logoUrl === "/icon.png" || data.logoUrl === "/logo.png") ? "/logo-raport-bw.png" : data.logoUrl}
                   alt="Logo Pesantren"
-                  className="h-16 w-16 object-contain mb-2"
+                  className="h-20 w-20 object-contain mb-2 filter contrast-105"
                 />
                 
-                <h1 className="font-arabic text-2xl md:text-3xl font-bold tracking-wide" dir="rtl">
+                <h1 className="font-arabic amiri-bold text-2xl md:text-3xl font-bold tracking-wide" dir="rtl">
                   كشف الدرجات الدراسية
                 </h1>
                 <h2 className="font-arabic text-lg md:text-xl font-bold mt-0.5" dir="rtl">
