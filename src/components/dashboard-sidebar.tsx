@@ -36,6 +36,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationPopover } from "@/components/notification-popover";
+import { UserProfileModal } from "@/components/user-profile-modal";
 
 // Roles that use bottom grid nav on mobile
 const BOTTOM_NAV_ROLES = ["MUSTAHIQ", "MUNAWIB", "WALI_SANTRI"];
@@ -69,9 +70,13 @@ export function DashboardSidebar({ user }: SidebarProps) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const handleOpenProfile = () => setProfileModalOpen(true);
+    window.addEventListener("open-user-profile", handleOpenProfile);
+    return () => window.removeEventListener("open-user-profile", handleOpenProfile);
   }, []);
 
   const useBottomNav = BOTTOM_NAV_ROLES.includes(user.role);
@@ -401,17 +406,25 @@ export function DashboardSidebar({ user }: SidebarProps) {
             </div>
           )}
 
-          <div className="flex items-center gap-3 px-2">
-            <Avatar className="h-10 w-10 border border-border/60 shadow-xs">
-              <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                {user.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="overflow-hidden">
-              <p className="text-sm font-bold truncate leading-tight text-foreground/90">{user.name}</p>
-              <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider mt-0.5">{user.role.replace("_", " ")}</p>
+          <button
+            type="button"
+            onClick={() => setProfileModalOpen(true)}
+            className="w-full flex items-center justify-between p-2 rounded-xl border border-border/60 bg-muted/20 hover:bg-muted/50 transition-colors text-left cursor-pointer group"
+            title="Klik untuk mengubah Username & Password"
+          >
+            <div className="flex items-center gap-3 overflow-hidden">
+              <Avatar className="h-10 w-10 border border-border/60 shadow-xs shrink-0">
+                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                  {user.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="overflow-hidden min-w-0">
+                <p className="text-sm font-bold truncate leading-tight text-foreground/90 group-hover:text-primary transition-colors">{user.name}</p>
+                <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider mt-0.5">{user.role.replace("_", " ")}</p>
+              </div>
             </div>
-          </div>
+            <KeyRound className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mr-1" />
+          </button>
           <Button
             variant="ghost"
             onClick={() => signOut({ callbackUrl: "/login" })}
@@ -585,17 +598,28 @@ export function DashboardSidebar({ user }: SidebarProps) {
               </div>
 
               <div className="space-y-4 border-t border-border/80 pt-4 shrink-0 mt-auto">
-                <div className="flex items-center gap-3 px-2">
-                  <Avatar className="h-10 w-10 border border-border/60 shadow-xs">
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                      {user.name.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-bold truncate leading-tight text-foreground/90">{user.name}</p>
-                    <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider mt-0.5">{user.role.replace("_", " ")}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setProfileModalOpen(true);
+                  }}
+                  className="w-full flex items-center justify-between p-2 rounded-xl border border-border/60 bg-muted/20 hover:bg-muted/50 transition-colors text-left cursor-pointer group"
+                  title="Klik untuk mengubah Username & Password"
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <Avatar className="h-10 w-10 border border-border/60 shadow-xs shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {user.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="overflow-hidden min-w-0">
+                      <p className="text-sm font-bold truncate leading-tight text-foreground/90 group-hover:text-primary transition-colors">{user.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate font-semibold uppercase tracking-wider mt-0.5">{user.role.replace("_", " ")}</p>
+                    </div>
                   </div>
-                </div>
+                  <KeyRound className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mr-1" />
+                </button>
 
                 {/* Inline Notification Center for Mobile Viewports */}
                 <div className="px-2">
@@ -645,6 +669,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
           </>
         )}
       </AnimatePresence>
+
+      <UserProfileModal open={profileModalOpen} onOpenChange={setProfileModalOpen} />
     </>
   );
 }

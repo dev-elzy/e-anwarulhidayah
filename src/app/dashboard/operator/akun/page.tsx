@@ -15,6 +15,26 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { apiGet, apiPost } from "@/lib/api-client";
 
+import { Input } from "@/components/ui/input";
+
+function getSuggestedUsername(fullName: string): string {
+  if (!fullName) return "";
+  const clean = fullName
+    .replace(/\b(k\.h\.|kh\.|kyai|kiai|habib|gus|ust\.|ustadz|ustad|drs\.|dr\.|lc\.|m\.pd|s\.pd|s\.ag|m\.ag)\b/gi, "")
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"’]/g, " ")
+    .trim();
+  const words = clean.split(/\s+/).filter(w => w.length > 0);
+  if (words.length === 0) return "ustadz";
+  const skipWords = new Set(["m", "muh", "muhammad", "moch", "mochamad", "mohammad", "ahmad", "achmad", "siti", "nur"]);
+  let target = words[0];
+  if (words.length > 1 && skipWords.has(words[0].toLowerCase())) {
+    target = words[1];
+  }
+  if (words.length > 2 && (target.toLowerCase() === "lulu" || target.toLowerCase() === "lu" || skipWords.has(target.toLowerCase()))) {
+    target = words[2];
+  }
+  return target.toLowerCase().replace(/[^a-z0-9]/g, "") || "ustadz";
+}
 
 export default function AkunPenggunaPage() {
   const { data: session } = useSession();
@@ -31,7 +51,17 @@ export default function AkunPenggunaPage() {
   const [selectedUstadz, setSelectedUstadz] = useState<any | null>(null);
   const [selectedWali, setSelectedWali] = useState<any | null>(null);
   const [selectedRole, setSelectedRole] = useState<"MUSTAHIQ" | "MUNAWIB">("MUSTAHIQ");
+  const [customUsername, setCustomUsername] = useState("");
+  const [customPassword, setCustomPassword] = useState("pesantren123");
   const [newAccountInfo, setNewAccountInfo] = useState<{ username: string; password: string } | null>(null);
+
+  // Dialog: Edit Akun
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [editUsername, setEditUsername] = useState("");
+  const [editRole, setEditRole] = useState<string>("MUNAWIB");
+  const [editPassword, setEditPassword] = useState("");
+  const [editActive, setEditActive] = useState(true);
 
   // Dialog: Konfirmasi Reset
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -65,17 +95,65 @@ export default function AkunPenggunaPage() {
     setConfirmOpen(true);
   };
 
+  const handleOpenCreateDialog = (ustadzItem: any) => {
+    setSelectedUstadz(ustadzItem);
+    setSelectedRole(ustadzItem.peran || "MUSTAHIQ");
+    setCustomUsername(getSuggestedUsername(ustadzItem.nama));
+    setCustomPassword("pesantren123");
+    setNewAccountInfo(null);
+    setCreateDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (item: any) => {
+    if (!item.user) return;
+    setEditingItem(item);
+    setEditUsername(item.user.username);
+    setEditRole(item.user.roleId);
+    setEditPassword("");
+    setEditActive(item.user.active ?? true);
+    setEditDialogOpen(true);
+  };
+
   const handleCreateAccount = () => {
     if (!selectedUstadz || !session?.user?.id) return;
     startTransition(async () => {
       const res = await apiPost("createUstadzAccount", {
-        params: { ustadzId: selectedUstadz.id, roleId: selectedRole },
+        params: { 
+          ustadzId: selectedUstadz.id, 
+          roleId: selectedRole,
+          username: customUsername.trim() || undefined,
+          password: customPassword.trim() || undefined
+        },
       });
       if (res.error) {
         toast.error("Gagal", { description: res.error });
       } else {
         toast.success("Akun berhasil dibuat!");
-        setNewAccountInfo({ username: (res as any).username, password: "pesantren123" });
+        setNewAccountInfo({ username: (res as any).username || customUsername, password: customPassword || "pesantren123" });
+        loadData();
+      }
+    });
+  };
+
+  const handleSaveEditAccount = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem?.user?.id || !session?.user?.id) return;
+    startTransition(async () => {
+      const res = await apiPost("updateUserAccount", {
+        id: editingItem.user.id,
+        data: {
+          username: editUsername.trim(),
+          roleId: editRole,
+          password: editPassword.trim() || undefined,
+          active: editActive
+        }
+      });
+      if (res.error) {
+        toast.error("Gagal", { description: res.error });
+      } else {
+        toast.success("Berhasil", { description: res.message });
+        setEditDialogOpen(false);
+        setEditingItem(null);
         loadData();
       }
     });
@@ -281,20 +359,28 @@ export default function AkunPenggunaPage() {
                               <Button
                                 size="sm"
                                 className="bg-blue-gradient text-white rounded-xl font-semibold shadow-sm"
-                                onClick={() => { setSelectedUstadz(item); setNewAccountInfo(null); setCreateDialogOpen(true); }}
+                                onClick={() => handleOpenCreateDialog(item)}
                               >
                                 <UserPlus className="h-4 w-4 mr-1" /> Buat Akun
                               </Button>
                             ) : (
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50"
+                                  className="rounded-xl border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950/40"
+                                  onClick={() => handleOpenEditDialog(item)}
+                                >
+                                  Edit Akun
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950/40"
                                   onClick={() => handleResetPassword(item.user.id, item.nama)}
                                   disabled={isPending}
                                 >
-                                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Reset Password
+                                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Reset
                                 </Button>
                                 <Button
                                   size="sm"
@@ -303,7 +389,7 @@ export default function AkunPenggunaPage() {
                                   onClick={() => handleDeleteAccount(item.user.id, item.nama)}
                                   disabled={isPending}
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" /> Hapus Akun
+                                  <Trash2 className="h-3.5 w-3.5" /> Hapus
                                 </Button>
                               </div>
                             )}
@@ -412,15 +498,23 @@ export default function AkunPenggunaPage() {
                                 <UserPlus className="h-4 w-4 mr-1" /> Buat Akun
                               </Button>
                             ) : (
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50"
+                                  className="rounded-xl border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950/40"
+                                  onClick={() => handleOpenEditDialog(item)}
+                                >
+                                  Edit Akun
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950/40"
                                   onClick={() => handleResetPassword(item.user.id, item.nama)}
                                   disabled={isPending}
                                 >
-                                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Reset Password
+                                  <RefreshCw className="h-3.5 w-3.5 mr-1" /> Reset
                                 </Button>
                                 <Button
                                   size="sm"
@@ -429,7 +523,7 @@ export default function AkunPenggunaPage() {
                                   onClick={() => handleDeleteAccount(item.user.id, item.nama)}
                                   disabled={isPending}
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" /> Hapus Akun
+                                  <Trash2 className="h-3.5 w-3.5" /> Hapus
                                 </Button>
                               </div>
                             )}
@@ -456,9 +550,9 @@ export default function AkunPenggunaPage() {
       <Dialog open={createDialogOpen} onOpenChange={(o) => { setCreateDialogOpen(o); if (!o) setNewAccountInfo(null); }}>
         <DialogContent className="max-w-md bg-popover backdrop-blur-xl border border-border rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-glow-gold">Buat Akun Login</DialogTitle>
+            <DialogTitle className="text-glow-gold">Buat Akun Login Ustadz</DialogTitle>
             <DialogDescription>
-              Membuat akun untuk <b>{selectedUstadz?.nama}</b>. Password default: <b className="font-mono">pesantren123</b>
+              Buat akun login untuk <b>{selectedUstadz?.nama}</b>.
             </DialogDescription>
           </DialogHeader>
 
@@ -493,6 +587,26 @@ export default function AkunPenggunaPage() {
           ) : (
             <div className="space-y-4 pt-2">
               <div className="space-y-1.5">
+                <Label>Username Akun</Label>
+                <Input
+                  value={customUsername}
+                  onChange={(e) => setCustomUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                  placeholder="contoh: khulal"
+                  className="font-mono bg-white/50 dark:bg-black/20"
+                />
+                <p className="text-xs text-muted-foreground">Disarankan nama panggilan singkat tanpa spasi.</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Password Awal</Label>
+                <Input
+                  value={customPassword}
+                  onChange={(e) => setCustomPassword(e.target.value)}
+                  placeholder="pesantren123"
+                  className="font-mono bg-white/50 dark:bg-black/20"
+                />
+                <p className="text-xs text-muted-foreground">Default: <code className="font-mono">pesantren123</code></p>
+              </div>
+              <div className="space-y-1.5">
                 <Label>Peran / Role</Label>
                 <Select value={selectedRole} onValueChange={(v: any) => setSelectedRole(v)}>
                   <SelectTrigger className="bg-white/50 dark:bg-black/20">
@@ -504,21 +618,101 @@ export default function AkunPenggunaPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-500 rounded-xl p-3 text-xs">
-                <b>Username</b> akan dibuat otomatis dari nama ustadz.<br />
-                <b>Password default</b>: <span className="font-mono">pesantren123</span> (wajib diganti saat login pertama).
-              </div>
-              <DialogFooter>
+              <DialogFooter className="pt-2">
                 <Button
                   onClick={handleCreateAccount}
-                  disabled={isPending}
-                  className="bg-blue-gradient text-white font-bold w-full rounded-xl"
+                  disabled={isPending || !customUsername.trim()}
+                  className="bg-blue-gradient text-white font-bold w-full rounded-xl cursor-pointer"
                 >
                   {isPending ? "Membuat akun..." : "Buat Akun Sekarang"}
                 </Button>
               </DialogFooter>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog: Edit Akun */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md bg-popover backdrop-blur-xl border border-border rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-glow-gold">Edit Akun Pengguna</DialogTitle>
+            <DialogDescription>
+              Perbarui username, role, atau ubah password untuk <b>{editingItem?.nama}</b>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveEditAccount} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Username</Label>
+              <Input
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value.toLowerCase().replace(/\s+/g, ""))}
+                placeholder="contoh: khulal"
+                required
+                className="font-mono bg-white/50 dark:bg-black/20"
+              />
+            </div>
+
+            {editingItem?.user?.roleId !== "WALI_SANTRI" && (
+              <div className="space-y-1.5">
+                <Label>Peran / Role</Label>
+                <Select value={editRole} onValueChange={(v: any) => setEditRole(v)}>
+                  <SelectTrigger className="bg-white/50 dark:bg-black/20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MUSTAHIQ">🎓 Mustahiq (Wali Kelas)</SelectItem>
+                    <SelectItem value="MUNAWIB">📚 Munawwib (Pengajar)</SelectItem>
+                    <SelectItem value="OPERATOR">⚡ Operator</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label>Password Baru (Opsional)</Label>
+              <Input
+                type="password"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                placeholder="Kosongkan jika tidak ingin mengubah password"
+                className="bg-white/50 dark:bg-black/20"
+              />
+              <p className="text-xs text-muted-foreground">Minimal 6 karakter jika diisi.</p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="editActive"
+                checked={editActive}
+                onChange={(e) => setEditActive(e.target.checked)}
+                className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
+              />
+              <Label htmlFor="editActive" className="cursor-pointer text-sm font-normal">
+                Akun Aktif (Dapat Login ke Sistem)
+              </Label>
+            </div>
+
+            <DialogFooter className="pt-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+                className="rounded-xl"
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                disabled={isPending || !editUsername.trim()}
+                className="bg-blue-gradient text-white font-bold rounded-xl cursor-pointer"
+              >
+                {isPending ? "Menyimpan..." : "Simpan Perubahan"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

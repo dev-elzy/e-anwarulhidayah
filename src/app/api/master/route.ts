@@ -10,6 +10,7 @@ import {
   getKelasList, getKamarList,
   getUsersWithUstadz, getUsersWithWali,
   createUstadzAccount, resetUserPassword, autoGenerateAccounts, createWaliAccount,
+  updateUserAccount, updateSelfProfile,
   getAlumniList, changeSantriStatus,
 } from "@/actions/master";
 
@@ -150,10 +151,16 @@ export async function POST(request: NextRequest) {
 
       // ── Akun ──
       case "createUstadzAccount":
-        result = await createUstadzAccount(params.ustadzId, params.roleId, userId);
+        result = await createUstadzAccount(params.ustadzId, params.roleId, userId, params.username, params.password);
         break;
       case "createWaliAccount":
         result = await createWaliAccount(params.waliId, userId);
+        break;
+      case "updateUserAccount":
+        result = await updateUserAccount(id, data, userId);
+        break;
+      case "updateSelfProfile":
+        result = await updateSelfProfile(userId, data);
         break;
       case "resetUserPassword":   result = await resetUserPassword(id, userId); break;
       case "autoGenerateAccounts": result = await autoGenerateAccounts(userId); break;

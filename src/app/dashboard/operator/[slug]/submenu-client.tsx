@@ -22,6 +22,7 @@ import {
   Phone, 
   MapPin, 
   FileCheck,
+  GraduationCap,
   Settings 
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -264,6 +265,8 @@ export function OperatorSubmenuClient({
       setUstadzNama(item.nama);
       setUstadzHp(item.nomorHp);
       setUstadzAlamat(item.alamat);
+      setUstadzPeran(item.peran || (item.kelasWaliId ? "MUSTAHIQ" : "MUNAWIB"));
+      setUstadzKelasWaliId(item.kelasWaliId || "");
     } else if (slug === "kelas") {
       setKelasNama(item.namaKelas);
       setKelasTingkatan(item.tingkatan);
@@ -346,6 +349,8 @@ export function OperatorSubmenuClient({
   const [ustadzNama, setUstadzNama] = useState("");
   const [ustadzHp, setUstadzHp] = useState("");
   const [ustadzAlamat, setUstadzAlamat] = useState("");
+  const [ustadzPeran, setUstadzPeran] = useState<"MUSTAHIQ" | "MUNAWIB">("MUNAWIB");
+  const [ustadzKelasWaliId, setUstadzKelasWaliId] = useState("");
 
   // 2. Kelas Form State
   const [kelasNama, setKelasNama] = useState("");
@@ -405,27 +410,57 @@ export function OperatorSubmenuClient({
       if (editingItem) {
         const res = await apiPost("updateUstadz", {
           id: editingItem.id,
-          data: { nama: ustadzNama, nomorHp: ustadzHp, alamat: ustadzAlamat },
+          data: { 
+            nama: ustadzNama, 
+            nomorHp: ustadzHp, 
+            alamat: ustadzAlamat,
+            peran: ustadzPeran,
+            kelasWaliId: ustadzPeran === "MUSTAHIQ" ? ustadzKelasWaliId : null,
+          },
         });
         if (res.error) {
           toast.error("Gagal", { description: res.error });
         } else {
           toast.success("Berhasil", { description: res.message });
           setDialogOpen(false);
-          setUstadzList(ustadzList.map(u => u.id === editingItem.id ? { ...u, nama: ustadzNama, nomorHp: ustadzHp, alamat: ustadzAlamat } : u));
+          setUstadzList(ustadzList.map(u => u.id === editingItem.id ? { 
+            ...u, 
+            nama: ustadzNama, 
+            nomorHp: ustadzHp, 
+            alamat: ustadzAlamat,
+            peran: ustadzPeran,
+            kelasWaliId: ustadzPeran === "MUSTAHIQ" ? ustadzKelasWaliId : null,
+            kelasWali: ustadzPeran === "MUSTAHIQ" ? kelasList.find(k => k.id === ustadzKelasWaliId)?.namaKelas || null : null
+          } : u));
           setEditingItem(null);
         }
       } else {
         const res = await apiPost("createUstadz", {
-          data: { nama: ustadzNama, nomorHp: ustadzHp, alamat: ustadzAlamat },
+          data: { 
+            nama: ustadzNama, 
+            nomorHp: ustadzHp, 
+            alamat: ustadzAlamat,
+            peran: ustadzPeran,
+            kelasWaliId: ustadzPeran === "MUSTAHIQ" ? ustadzKelasWaliId : null,
+          },
         });
         if (res.error) {
           toast.error("Gagal", { description: res.error });
         } else {
           toast.success("Berhasil", { description: res.message });
           setDialogOpen(false);
-          setUstadzList([...ustadzList, { id: Math.random().toString(), nama: ustadzNama, nomorHp: ustadzHp, alamat: ustadzAlamat, statusAktif: true }]);
+          setUstadzList([...ustadzList, { 
+            id: res.id || Math.random().toString(), 
+            nama: ustadzNama, 
+            nomorHp: ustadzHp, 
+            alamat: ustadzAlamat, 
+            statusAktif: true,
+            peran: ustadzPeran,
+            kelasWaliId: ustadzPeran === "MUSTAHIQ" ? ustadzKelasWaliId : null,
+            kelasWali: ustadzPeran === "MUSTAHIQ" ? kelasList.find(k => k.id === ustadzKelasWaliId)?.namaKelas || null : null
+          }]);
           setUstadzNama(""); setUstadzHp(""); setUstadzAlamat("");
+          setUstadzPeran("MUNAWIB"); setUstadzKelasWaliId("");
         }
       }
     });
@@ -634,6 +669,56 @@ export function OperatorSubmenuClient({
                     <Label htmlFor="u-alamat" className="text-xs md:text-sm font-bold text-foreground">Alamat Tinggal / Domisili</Label>
                     <Input id="u-alamat" required value={ustadzAlamat} onChange={(e) => setUstadzAlamat(e.target.value)} placeholder="Contoh: Asrama Putra Lt. 2 / Desa..." className="h-11 rounded-xl bg-muted/40 border-border/60" />
                   </div>
+
+                  {/* Pengaturan Status Mustahiq / Munawwib */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-muted/30 border border-border/60">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="u-peran" className="text-xs md:text-sm font-bold text-foreground flex items-center gap-1.5">
+                        <GraduationCap className="h-4 w-4 text-primary" />
+                        Status Peran Ustadz
+                      </Label>
+                      <Select value={ustadzPeran} onValueChange={(val: any) => setUstadzPeran(val || "MUNAWIB")}>
+                        <SelectTrigger id="u-peran" className="h-11 rounded-xl bg-card border-border/60">
+                          <SelectValue placeholder="Pilih Peran" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="MUSTAHIQ">🎓 MUSTAHIQ (Wali Kelas)</SelectItem>
+                          <SelectItem value="MUNAWIB">📚 MUNAWWIB (Pengajar Kitab)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[11px] text-muted-foreground">
+                        {ustadzPeran === "MUSTAHIQ" ? "Mustahiq memiliki hak akses raport & kehadiran kelas." : "Munawwib bertugas mengajar kitab & absensi harian."}
+                      </p>
+                    </div>
+
+                    {ustadzPeran === "MUSTAHIQ" ? (
+                      <div className="space-y-1.5">
+                        <Label htmlFor="u-kelas" className="text-xs md:text-sm font-bold text-foreground flex items-center gap-1.5">
+                          <BookOpen className="h-4 w-4 text-primary" />
+                          Wali Kelas Untuk
+                        </Label>
+                        <Select value={ustadzKelasWaliId} onValueChange={(val) => setUstadzKelasWaliId(val || "")}>
+                          <SelectTrigger id="u-kelas" className="h-11 rounded-xl bg-card border-border/60">
+                            <SelectValue placeholder="Pilih Kelas yang Diampu" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {kelasList.map(k => (
+                              <SelectItem key={k.id} value={k.id}>
+                                {k.namaKelas} ({k.tingkatan})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[11px] text-muted-foreground">Pilih kelas tempat ustadz ini bertugas sebagai wali kelas.</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col justify-center text-xs text-muted-foreground p-2 rounded-lg bg-card/50 border border-border/40">
+                        <span className="font-semibold text-foreground">Pengajar Umum</span>
+                        <span>Dapat dijadwalkan mengajar berbagai mata pelajaran / kitab di kelas manapun.</span>
+                      </div>
+                    )}
+                  </div>
+
                   <DialogFooter className="pt-3 border-t border-border/60 gap-2">
                     <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl h-11 px-5 font-semibold">Batal</Button>
                     <Button type="submit" disabled={isPending} className="bg-primary text-primary-foreground font-bold rounded-xl h-11 px-6 cursor-pointer shadow-sm">
@@ -847,6 +932,7 @@ export function OperatorSubmenuClient({
               <TableHeader className="bg-white/50">
                 <TableRow>
                   <TableHead className="font-bold">Nama Lengkap</TableHead>
+                  <TableHead className="font-bold">Peran / Status</TableHead>
                   <TableHead className="font-bold">Nomor Telepon</TableHead>
                   <TableHead className="font-bold">Alamat Asal</TableHead>
                   <TableHead className="font-bold">Status</TableHead>
@@ -857,6 +943,17 @@ export function OperatorSubmenuClient({
                 {ustadzList.map(u => (
                   <TableRow key={u.id}>
                     <TableCell className="font-bold text-sm">{u.nama}</TableCell>
+                    <TableCell>
+                      {u.peran === "MUSTAHIQ" || u.kelasWali ? (
+                        <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30 rounded-lg font-bold">
+                          🎓 Mustahiq {u.kelasWali ? `(${u.kelasWali})` : "(Wali Kelas)"}
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30 rounded-lg font-bold">
+                          📚 Munawwib (Pengajar)
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="font-mono text-xs">{u.nomorHp}</TableCell>
                     <TableCell className="text-xs text-muted-foreground font-semibold">{u.alamat}</TableCell>
                     <TableCell>

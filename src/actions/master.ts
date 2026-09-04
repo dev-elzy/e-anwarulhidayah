@@ -189,11 +189,56 @@ export async function getUstadzList() {
   const db = getDb();
   if (!db) return [];
   try {
-    return await db.select().from(ustadz);
+    const list = await db.select().from(ustadz);
+    const classes = await db.select().from(kelas);
+    const userList = await db.select().from(users);
+
+    return list.map((u: any) => {
+      const assignedKelas = classes.find((k: any) => k.waliKelasId === u.id);
+      const linkedUser = userList.find((usr: any) => usr.ustadzId === u.id);
+      const role = linkedUser ? linkedUser.roleId : (assignedKelas ? "MUSTAHIQ" : "MUNAWIB");
+      return {
+        ...u,
+        peran: role,
+        kelasWali: assignedKelas ? assignedKelas.namaKelas : null,
+        kelasWaliId: assignedKelas ? assignedKelas.id : null,
+        user: linkedUser || null,
+      };
+    });
   } catch (error) {
     console.error("Failed to get ustadz:", error);
     return [];
   }
+}
+
+export function generateUstadzUsername(fullName: string): string {
+  if (!fullName) return "ustadz";
+  
+  // 1. Remove title prefixes & honorifics
+  const clean = fullName
+    .replace(/\b(k\.h\.|kh\.|kyai|kiai|habib|gus|ust\.|ustadz|ustad|drs\.|dr\.|lc\.|m\.pd|s\.pd|s\.ag|m\.ag)\b/gi, "")
+    .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"’]/g, " ")
+    .trim();
+
+  // 2. Split words
+  const words = clean.split(/\s+/).filter(w => w.length > 0);
+  if (words.length === 0) return "ustadz";
+
+  const skipWords = new Set(["m", "muh", "muhammad", "moch", "mochamad", "mohammad", "ahmad", "achmad", "siti", "nur"]);
+  
+  let target = words[0];
+  if (words.length > 1) {
+    if (skipWords.has(words[0].toLowerCase())) {
+      target = words[1];
+    }
+  }
+
+  if (words.length > 2 && (target.toLowerCase() === "lulu" || target.toLowerCase() === "lu" || skipWords.has(target.toLowerCase()))) {
+    target = words[2];
+  }
+
+  const result = target.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return result || "ustadz";
 }
 
 export async function createUstadz(data: any, operatorId: string) {
@@ -217,8 +262,13 @@ export async function createUstadz(data: any, operatorId: string) {
       statusAktif: true
     });
 
-    await logActivity(verifiedOperatorId, "CREATE_USTADZ", `Menambahkan ustadz baru: ${data.nama}`);
-    return { success: true, message: "Data ustadz berhasil ditambahkan." };
+    // If assigned as Mustahiq to a specific class
+    if (data.peran === "MUSTAHIQ" && data.kelasWaliId) {
+      await db.update(kelas).set({ waliKelasId: id }).where(eq(kelas.id, data.kelasWaliId));
+    }
+
+    await logActivity(verifiedOperatorId, "CREATE_USTADZ", `Menambahkan ustadz baru: ${data.nama} (Peran: ${data.peran || "MUNAWIB"})`);
+    return { success: true, message: "Data ustadz berhasil ditambahkan.", id };
   } catch (error: any) {
     console.error("Failed to create ustadz:", error);
     return { error: error.message || "Gagal menambahkan ustadz." };
@@ -287,6 +337,24 @@ export async function updateUstadz(id: string, data: any, operatorId: string) {
       nomorHp: data.nomorHp,
       alamat: data.alamat,
     }).where(eq(ustadz.id, id));
+
+    // Update Mustahiq / Wali Kelas assignment if specified
+    if (data.peran === "MUSTAHIQ") {
+      // If a class is selected, assign ustadz to it
+      if (data.kelasWaliId) {
+        // Clear previous classes where this ustadz was wali
+        await db.update(kelas).set({ waliKelasId: null }).where(eq(kelas.waliKelasId, id));
+        // Assign to new class
+        await db.update(kelas).set({ waliKelasId: id }).where(eq(kelas.id, data.kelasWaliId));
+      }
+      // If ustadz has a user account, sync role to MUSTAHIQ
+      await db.update(users).set({ roleId: "MUSTAHIQ" }).where(eq(users.ustadzId, id));
+    } else if (data.peran === "MUNAWIB") {
+      // Clear any class wali assignments
+      await db.update(kelas).set({ waliKelasId: null }).where(eq(kelas.waliKelasId, id));
+      // If ustadz has a user account, sync role to MUNAWIB
+      await db.update(users).set({ roleId: "MUNAWIB" }).where(eq(users.ustadzId, id));
+    }
 
     await logActivity(operatorId, "UPDATE_USTADZ", `Mengubah data ustadz: ${data.nama}`);
     return { success: true, message: "Data ustadz berhasil diubah." };
@@ -398,7 +466,13 @@ export async function getUsersWithWali() {
   }
 }
 
-export async function createUstadzAccount(ustadzId: string, roleId: "MUSTAHIQ" | "MUNAWIB", operatorId: string) {
+export async function createUstadzAccount(
+  ustadzId: string, 
+  roleId: "MUSTAHIQ" | "MUNAWIB", 
+  operatorId: string,
+  customUsername?: string,
+  customPassword?: string
+) {
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
   try {
@@ -409,24 +483,29 @@ export async function createUstadzAccount(ustadzId: string, roleId: "MUSTAHIQ" |
     const u = await db.select().from(ustadz).where(eq(ustadz.id, ustadzId)).limit(1);
     if (u.length === 0) return { error: "Ustadz tidak ditemukan." };
 
-    // Generate username from name: lowercase, no "ust." prefix, and no spaces/special chars
-    const baseUsername = u[0].nama
-      .toLowerCase()
-      .replace(/^(ust\.\s*|ustadz\s*)/g, "")
-      .replace(/[^a-z0-9]/g, "")
-      .substring(0, 20);
-
-    // Ensure username is unique
-    let username = baseUsername;
-    let count = 1;
-    while (true) {
-      const existing = await db.select().from(users).where(eq(users.username, username)).limit(1);
-      if (existing.length === 0) break;
-      username = `${baseUsername}_${count++}`;
+    let username = "";
+    if (customUsername && customUsername.trim()) {
+      username = customUsername.trim().toLowerCase().replace(/[^a-z0-9_.]/g, "");
+      if (username.length < 3) return { error: "Username minimal 3 karakter." };
+      const check = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      if (check.length > 0) {
+        return { error: `Username "${username}" sudah digunakan pengguna lain. Silakan pilih username lain.` };
+      }
+    } else {
+      const baseUsername = generateUstadzUsername(u[0].nama);
+      username = baseUsername;
+      let count = 1;
+      while (true) {
+        const check = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        if (check.length === 0) break;
+        username = `${baseUsername}_${count++}`;
+      }
     }
 
-    const DEFAULT_PASSWORD = "pesantren123";
-    const passwordHash = await hashPassword(DEFAULT_PASSWORD);
+    const initialPassword = customPassword && customPassword.trim().length >= 6 
+      ? customPassword.trim() 
+      : "pesantren123";
+    const passwordHash = await hashPassword(initialPassword);
     const id = "USR-" + Math.random().toString(36).substring(2, 11).toUpperCase();
 
     await db.insert(users).values({
@@ -439,12 +518,12 @@ export async function createUstadzAccount(ustadzId: string, roleId: "MUSTAHIQ" |
       ustadzId,
       waliId: null,
       active: true,
-      mustChangePassword: true,
+      mustChangePassword: customPassword ? false : true,
       createdAt: new Date().toISOString(),
     });
 
     await logActivity(operatorId, "CREATE_USTADZ_ACCOUNT", `Membuat akun ${roleId} untuk ustadz: ${u[0].nama} (username: ${username})`);
-    return { success: true, message: `Akun berhasil dibuat. Username: ${username}, Password: ${DEFAULT_PASSWORD}`, username };
+    return { success: true, message: `Akun berhasil dibuat. Username: ${username}, Password: ${initialPassword}`, username };
   } catch (error: any) {
     console.error("Failed to create ustadz account:", error);
     return { error: error.message || "Gagal membuat akun." };
@@ -550,6 +629,120 @@ export async function changeUserPassword(userId: string, newPassword: string) {
   } catch (error: any) {
     console.error("Failed to change password:", error);
     return { error: "Gagal mengubah password." };
+  }
+}
+
+export async function updateUserAccount(
+  userId: string,
+  data: { username?: string; roleId?: string; password?: string; active?: boolean },
+  operatorId: string
+) {
+  const db = getDb();
+  if (!db) return { error: "Database tidak terhubung." };
+  try {
+    const existing = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (existing.length === 0) return { error: "User tidak ditemukan." };
+
+    const updatePayload: any = {};
+
+    if (data.username && data.username.trim() !== existing[0].username) {
+      const cleanUsername = data.username.trim().toLowerCase().replace(/[^a-z0-9_.]/g, "");
+      if (cleanUsername.length < 3) return { error: "Username minimal 3 karakter." };
+      
+      const check = await db.select().from(users).where(eq(users.username, cleanUsername)).limit(1);
+      if (check.length > 0 && check[0].id !== userId) {
+        return { error: `Username "${cleanUsername}" sudah digunakan oleh akun lain.` };
+      }
+      updatePayload.username = cleanUsername;
+    }
+
+    if (data.roleId && ["MUSTAHIQ", "MUNAWIB", "OPERATOR", "PENGASUH", "SUPER_ADMIN", "WALI_SANTRI"].includes(data.roleId)) {
+      updatePayload.roleId = data.roleId;
+    }
+
+    if (data.password && data.password.trim().length >= 6) {
+      updatePayload.passwordHash = await hashPassword(data.password.trim());
+      updatePayload.mustChangePassword = false;
+    }
+
+    if (data.active !== undefined) {
+      updatePayload.active = data.active;
+    }
+
+    if (Object.keys(updatePayload).length > 0) {
+      await db.update(users).set(updatePayload).where(eq(users.id, userId));
+    }
+
+    await logActivity(operatorId, "UPDATE_USER_ACCOUNT", `Memperbarui akun user: ${existing[0].name} (${updatePayload.username || existing[0].username})`);
+    return { success: true, message: "Akun berhasil diperbarui." };
+  } catch (error: any) {
+    console.error("Failed to update user account:", error);
+    return { error: error.message || "Gagal memperbarui akun." };
+  }
+}
+
+export async function updateSelfProfile(
+  userId: string,
+  data: { username?: string; currentPassword?: string; newPassword?: string }
+) {
+  const db = getDb();
+  if (!db) return { error: "Database tidak terhubung." };
+  try {
+    const session = await auth();
+    if (!session?.user || session.user.id !== userId) {
+      return { error: "Akses ditolak: Anda hanya dapat memperbarui profil akun Anda sendiri." };
+    }
+
+    const u = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (u.length === 0) return { error: "Pengguna tidak ditemukan." };
+
+    const user = u[0];
+    const updatePayload: any = {};
+
+    // 1. Update Username if requested
+    if (data.username && data.username.trim() !== user.username) {
+      const cleanUsername = data.username.trim().toLowerCase().replace(/[^a-z0-9_.]/g, "");
+      if (cleanUsername.length < 3) return { error: "Username minimal 3 karakter." };
+      
+      const check = await db.select().from(users).where(eq(users.username, cleanUsername)).limit(1);
+      if (check.length > 0 && check[0].id !== userId) {
+        return { error: `Username "${cleanUsername}" sudah digunakan oleh akun lain. Silakan pilih username lain.` };
+      }
+      updatePayload.username = cleanUsername;
+    }
+
+    // 2. Update Password if requested
+    if (data.newPassword && data.newPassword.trim()) {
+      if (data.newPassword.trim().length < 8) {
+        return { error: "Password baru minimal 8 karakter." };
+      }
+
+      if (!user.mustChangePassword) {
+        if (!data.currentPassword) {
+          return { error: "Harap masukkan password saat ini untuk verifikasi keamanan." };
+        }
+        const matches = await verifyPassword(data.currentPassword, user.passwordHash);
+        if (!matches) {
+          return { error: "Password saat ini salah." };
+        }
+      }
+
+      updatePayload.passwordHash = await hashPassword(data.newPassword.trim());
+      updatePayload.mustChangePassword = false;
+    }
+
+    if (Object.keys(updatePayload).length > 0) {
+      await db.update(users).set(updatePayload).where(eq(users.id, userId));
+    }
+
+    return { 
+      success: true, 
+      message: "Profil & kredensial akun Anda berhasil diperbarui.",
+      username: updatePayload.username || user.username 
+    };
+  } catch (error: any) {
+    console.error("Failed to update self profile:", error);
+    return { error: error.message || "Gagal memperbarui profil." };
   }
 }
 

@@ -163,13 +163,12 @@ export function CommandPalette() {
     if (session) {
       list.push(
         {
-          title: "Ubah Password Akun",
+          title: "Pengaturan Akun (Ganti Username & Password)",
           category: "Akun",
           icon: KeyRound,
           action: () => {
             setIsOpen(false);
-            // Dispatch custom event to trigger password modal (handled in components/change-password-modal.tsx)
-            window.dispatchEvent(new CustomEvent("open-change-password"));
+            window.dispatchEvent(new CustomEvent("open-user-profile"));
           }
         },
         { title: "Keluar dari Aplikasi", category: "Akun", icon: LogOut, action: () => signOut({ callbackUrl: "/login" }) }
