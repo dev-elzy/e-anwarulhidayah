@@ -37,7 +37,7 @@ export default function Home() {
         <div className="flex items-center gap-2.5">
           <div className="relative h-9 w-9 md:h-10 md:w-10 rounded-full overflow-hidden shadow-md border border-white/20 shrink-0">
             <Image 
-              src="https://res.cloudinary.com/dkwaosfda/image/upload/v1780534958/e-anwarulhidayah/settings/riheomgl2gzimuu2tvjh.jpg" 
+              src="/icon.png" 
               alt="Logo Anwarul Hidayah" 
               fill
               unoptimized
@@ -95,8 +95,8 @@ export default function Home() {
 
       {/* About & Features Section */}
       <section className="w-full py-24 px-6 md:px-12 z-10 relative bg-card/60 backdrop-blur-xl border-t border-border/60 shadow-[0_-20px_50px_rgba(0,0,0,0.03)]">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] -z-10" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-accent/10 blur-[120px] -z-10" />
+        <div className="absolute top-0 right-0 w-125 h-125 rounded-full bg-primary/10 blur-[120px] -z-10" />
+        <div className="absolute bottom-0 left-0 w-125 h-125 rounded-full bg-accent/10 blur-[120px] -z-10" />
         
         <div className="max-w-6xl mx-auto flex flex-col items-center">
           {/* Section Header */}
@@ -148,7 +148,7 @@ export default function Home() {
               <div className="relative w-full h-56 flex items-center justify-center perspective-[1000px] mb-8">
                 <div className="absolute bottom-8 w-40 h-10 bg-primary/30 rounded-[100%] blur-xl transition-all duration-500 group-hover:scale-75 group-hover:opacity-50" />
                 
-                <div className="relative w-36 h-36 bg-gradient-to-b from-primary/15 to-primary/5 border border-primary/30 rounded-3xl backdrop-blur-xl flex items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(20deg)_rotateY(-20deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
+                <div className="relative w-36 h-36 bg-linear-to-b from-primary/15 to-primary/5 border border-primary/30 rounded-3xl backdrop-blur-xl flex items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(20deg)_rotateY(-20deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
                   <QrCode className="w-16 h-16 text-primary drop-shadow-[0_0_15px_rgba(30,136,229,0.5)]" />
                   
                   <div className="absolute -top-4 -right-4 w-12 h-12 bg-card border border-border rounded-xl backdrop-blur-lg flex items-center justify-center animate-pulse shadow-lg">
@@ -173,7 +173,7 @@ export default function Home() {
               <div className="relative w-full h-56 flex items-center justify-center perspective-[1000px] mb-8">
                 <div className="absolute bottom-8 w-40 h-10 bg-primary/30 rounded-[100%] blur-xl transition-all duration-500 group-hover:scale-75 group-hover:opacity-50" />
                 
-                <div className="relative w-40 h-32 bg-gradient-to-b from-primary/15 to-primary/5 border border-primary/30 rounded-2xl backdrop-blur-xl flex flex-col items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(15deg)_rotateY(20deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
+                <div className="relative w-40 h-32 bg-linear-to-b from-primary/15 to-primary/5 border border-primary/30 rounded-2xl backdrop-blur-xl flex flex-col items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(15deg)_rotateY(20deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-6 bg-primary/20 border-b border-primary/20 flex items-center px-3 gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-red-400/70" />
                     <div className="w-2 h-2 rounded-full bg-yellow-400/70" />
@@ -203,7 +203,7 @@ export default function Home() {
               <div className="relative w-full h-56 flex items-center justify-center perspective-[1000px] mb-8">
                 <div className="absolute bottom-8 w-40 h-10 bg-accent/30 rounded-[100%] blur-xl transition-all duration-500 group-hover:scale-75 group-hover:opacity-50" />
                 
-                <div className="relative w-44 h-28 bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/30 rounded-2xl backdrop-blur-xl flex flex-col justify-between p-4 transition-all duration-500 group-hover:transform-[rotateX(25deg)_rotateY(-15deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
+                <div className="relative w-44 h-28 bg-linear-to-br from-accent/20 to-primary/20 border border-accent/30 rounded-2xl backdrop-blur-xl flex flex-col justify-between p-4 transition-all duration-500 group-hover:transform-[rotateX(25deg)_rotateY(-15deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
                   <div className="w-8 h-6 bg-accent/30 rounded-md" />
                   <div className="flex justify-between items-end mt-4">
                     <div className="space-y-1.5">
@@ -233,7 +233,7 @@ export default function Home() {
               <div className="relative w-full h-56 flex items-center justify-center perspective-[1000px] mb-8">
                 <div className="absolute bottom-8 w-40 h-10 bg-primary/30 rounded-[100%] blur-xl transition-all duration-500 group-hover:scale-75 group-hover:opacity-50" />
                 
-                <div className="relative w-36 h-40 bg-gradient-to-b from-primary/20 to-primary/10 border border-primary/30 backdrop-blur-xl flex items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(10deg)_rotateY(25deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]" style={{ clipPath: "polygon(50% 0%, 100% 15%, 100% 75%, 50% 100%, 0% 75%, 0% 15%)" }}>
+                <div className="relative w-36 h-40 bg-linear-to-b from-primary/20 to-primary/10 border border-primary/30 backdrop-blur-xl flex items-center justify-center transition-all duration-500 group-hover:transform-[rotateX(10deg)_rotateY(25deg)_scale(1.1)_translateY(-15px)] shadow-[0_20px_50px_rgba(0,0,0,0.15)]" style={{ clipPath: "polygon(50% 0%, 100% 15%, 100% 75%, 50% 100%, 0% 75%, 0% 15%)" }}>
                   <ShieldCheck className="w-16 h-16 text-primary drop-shadow-[0_0_15px_rgba(30,136,229,0.5)]" />
                 </div>
                 

@@ -18,7 +18,9 @@ const geistMono = Geist_Mono({
 const amiri = Amiri({
   variable: "--font-amiri",
   weight: ["400", "700"],
+  style: ["normal", "italic"],
   subsets: ["arabic", "latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

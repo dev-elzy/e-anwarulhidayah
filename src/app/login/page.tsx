@@ -88,8 +88,8 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 relative overflow-hidden bg-background text-foreground">
       {/* Background 3D decorations */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[150px] animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-accent/10 blur-[150px] animate-pulse delay-700" />
+      <div className="absolute top-0 right-0 w-150 h-150 rounded-full bg-primary/10 blur-[150px] animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-150 h-150 rounded-full bg-accent/10 blur-[150px] animate-pulse delay-700" />
       
       {/* 3D Grid background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 dark:opacity-40" />
@@ -102,16 +102,16 @@ function LoginForm() {
       >
         <div className="relative transform-gpu transition-all duration-700 hover:transform-[rotateX(2deg)_rotateY(-2deg)_scale(1.01)]">
           {/* Glowing back panel */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-[2.5rem] blur-xl opacity-15 dark:opacity-25" />
+          <div className="absolute -inset-1 bg-linear-to-r from-primary to-accent rounded-[2.5rem] blur-xl opacity-15 dark:opacity-25" />
           
           <Card className="relative glass-panel rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col border-border/80">
             {/* Top Light reflection */}
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+            <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-primary via-accent to-primary" />
             
             <CardHeader className="text-center pt-10 pb-4">
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[1.5rem] overflow-hidden shadow-md border border-border/80 relative group bg-card">
                 <Image 
-                  src="https://res.cloudinary.com/dkwaosfda/image/upload/v1780534958/e-anwarulhidayah/settings/riheomgl2gzimuu2tvjh.jpg" 
+                  src="/icon.png" 
                   alt="Logo Anwarul Hidayah" 
                   fill
                   unoptimized

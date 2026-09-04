@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -10,7 +11,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --font-arabic: var(--font-amiri);
+  --font-arabic: "Amiri", var(--font-amiri), serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -409,8 +410,34 @@
     background: var(--muted-foreground);
   }
 
-  .font-arabic {
-    font-family: var(--font-amiri), "Amiri", "Traditional Arabic", "Scheherazade New", serif;
+  .amiri-regular {
+    font-family: "Amiri", var(--font-amiri), serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .amiri-bold {
+    font-family: "Amiri", var(--font-amiri), serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  .amiri-regular-italic {
+    font-family: "Amiri", var(--font-amiri), serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .amiri-bold-italic {
+    font-family: "Amiri", var(--font-amiri), serif;
+    font-weight: 700;
+    font-style: italic;
+  }
+
+  .font-arabic,
+  [dir="rtl"],
+  :lang(ar) {
+    font-family: "Amiri", var(--font-amiri), serif;
   }
 
   /* Classical Pesantren Raport Print Styles */

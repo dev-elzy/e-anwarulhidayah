@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -205,8 +206,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
         /* Simple header for bottom-nav roles — no hamburger */
         <header className="print:hidden md:hidden flex items-center justify-between px-4 py-2 bg-card/95 backdrop-blur-lg border-b border-border/80 sticky top-0 z-40 shadow-xs">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-xs">
-              <GraduationCap className="h-4 w-4" />
+            <div className="relative h-8 w-8 rounded-lg overflow-hidden shadow-xs border border-border/60 shrink-0">
+              <Image src="/icon.png" alt="Logo" fill className="object-cover" />
             </div>
             <span className="font-bold text-sm text-foreground tracking-tight">e-AnwarulHidayah</span>
           </div>
@@ -235,8 +236,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
         /* Hamburger header for drawer roles */
         <header className="print:hidden md:hidden flex items-center justify-between px-4 py-2.5 bg-card/95 backdrop-blur-lg border-b border-border/80 sticky top-0 z-40 shadow-xs">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-xs">
-              <GraduationCap className="h-4 w-4" />
+            <div className="relative h-8 w-8 rounded-lg overflow-hidden shadow-xs border border-border/60 shrink-0">
+              <Image src="/icon.png" alt="Logo" fill className="object-cover" />
             </div>
             <span className="font-bold text-sm text-foreground tracking-tight">e-AnwarulHidayah</span>
           </div>
@@ -262,8 +263,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
       <aside className="print:hidden hidden md:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-border/80 p-4 z-30 shadow-xs overflow-hidden">
         <div className="flex flex-col flex-1 overflow-hidden space-y-6">
           <div className="flex items-center gap-2.5 px-2 shrink-0">
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
-              <GraduationCap className="h-5.5 w-5.5" />
+            <div className="relative h-10 w-10 rounded-xl overflow-hidden shadow-sm border border-border/60 shrink-0">
+              <Image src="/icon.png" alt="Logo" fill className="object-cover" />
             </div>
             <div>
               <h1 className="font-bold text-base leading-none text-foreground tracking-tight">e-AnwarulHidayah</h1>
@@ -440,7 +441,7 @@ export function DashboardSidebar({ user }: SidebarProps) {
                   key={item.href}
                   href={item.href || "#"}
                   prefetch={true}
-                  className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all duration-200 min-h-[52px] min-w-[68px] shrink-0 relative cursor-pointer ${
+                  className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-all duration-200 min-h-13 min-w-17 shrink-0 relative cursor-pointer ${
                     isActive
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground"
@@ -486,8 +487,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
               <div className="flex flex-col flex-1 overflow-hidden space-y-6">
                 <div className="flex items-center justify-between border-b border-border/80 pb-3 shrink-0">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                      <GraduationCap className="h-4.5 w-4.5" />
+                    <div className="relative h-8 w-8 rounded-lg overflow-hidden shadow-xs border border-border/60 shrink-0">
+                      <Image src="/icon.png" alt="Logo" fill className="object-cover" />
                     </div>
                     <span className="font-bold text-sm tracking-tight text-foreground">e-AnwarulHidayah</span>
                   </div>

@@ -21,7 +21,6 @@ import {
   Building, 
   Phone, 
   MapPin, 
-  Upload, 
   FileCheck,
   Settings 
 } from "lucide-react";
@@ -866,10 +865,10 @@ export function OperatorSubmenuClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center flex justify-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(u)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(u)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-10">
                         <Pencil className="h-4.5 w-4.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteUstadz(u.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteUstadz(u.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-10">
                         <Trash2 className="h-4.5 w-4.5" />
                       </Button>
                     </TableCell>
@@ -920,10 +919,10 @@ export function OperatorSubmenuClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-center flex justify-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(k)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(k)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-10">
                         <Pencil className="h-4.5 w-4.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteKelas(k.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteKelas(k.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-10">
                         <Trash2 className="h-4.5 w-4.5" />
                       </Button>
                     </TableCell>
@@ -961,15 +960,15 @@ export function OperatorSubmenuClient({
                       <TableCell className="text-xs font-semibold">{km.kapasitas} Orang</TableCell>
                       <TableCell className="text-xs font-bold text-primary">{filled} Orang</TableCell>
                       <TableCell>
-                        <div className="w-[120px] bg-gray-200 h-2 rounded-full overflow-hidden flex">
+                        <div className="w-30 bg-gray-200 h-2 rounded-full overflow-hidden flex">
                           <div className={`h-full ${pct > 90 ? "bg-red-500" : pct > 70 ? "bg-amber-500" : "bg-green-500"}`} style={{ width: `${pct}%` }} />
                         </div>
                       </TableCell>
                       <TableCell className="text-center flex justify-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleStartEdit(km)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-[40px]">
+                        <Button variant="ghost" size="icon" onClick={() => handleStartEdit(km)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-10">
                           <Pencil className="h-4.5 w-4.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteKamar(km.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-[40px]">
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteKamar(km.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-10">
                           <Trash2 className="h-4.5 w-4.5" />
                         </Button>
                       </TableCell>
@@ -1002,10 +1001,10 @@ export function OperatorSubmenuClient({
                     <TableCell className="font-bold text-sm text-glow-gold">{kt.namaKitabMapel}</TableCell>
                     <TableCell className="text-xs text-muted-foreground font-semibold">{kt.keterangan || "-"}</TableCell>
                     <TableCell className="text-center flex justify-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(kt)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(kt)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-10">
                         <Pencil className="h-4.5 w-4.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteKitab(kt.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteKitab(kt.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-10">
                         <Trash2 className="h-4.5 w-4.5" />
                       </Button>
                     </TableCell>
@@ -1043,10 +1042,10 @@ export function OperatorSubmenuClient({
                     <TableCell className="font-bold text-xs text-glow-gold">{kitabList.find(kt => kt.id === j.kitabMapelId)?.namaKitabMapel || "Belum ada"}</TableCell>
                     <TableCell className="font-semibold text-xs">{ustadzList.find(u => u.id === j.ustadzId)?.nama || "Belum ada"}</TableCell>
                     <TableCell className="text-center flex justify-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(j)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleStartEdit(j)} className="text-blue-500 hover:text-blue-600 rounded-xl min-h-10">
                         <Pencil className="h-4.5 w-4.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDeleteJadwal(j.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-[40px]">
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteJadwal(j.id)} className="text-red-500 hover:text-red-600 rounded-xl min-h-10">
                         <Trash2 className="h-4.5 w-4.5" />
                       </Button>
                     </TableCell>
@@ -1335,7 +1334,7 @@ export function OperatorSubmenuClient({
               <CardTitle className="text-base font-bold">Pemetaan Hak Akses</CardTitle>
               <CardDescription>Centang hak akses yang diperbolehkan untuk peran: <span className="font-extrabold text-blue-600">{selectedRoleId}</span></CardDescription>
             </CardHeader>
-            <CardContent className="p-4 space-y-3 max-h-[500px] overflow-y-auto pr-2">
+            <CardContent className="p-4 space-y-3 max-h-125 overflow-y-auto pr-2">
               {permissionsList.map((p: any) => {
                 const isChecked = selectedPermissions.includes(p.id);
                 return (
@@ -1436,11 +1435,7 @@ export function OperatorSubmenuClient({
                 <div className="flex items-center gap-5 justify-center">
                   {/* Logo */}
                   <div className="h-20 w-20 rounded-full border-2 border-primary/30 bg-muted flex items-center justify-center overflow-hidden shadow-lg shrink-0">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="text-[9px] font-bold text-muted-foreground text-center p-1">Logo<br />Instansi</div>
-                    )}
+                    <img src={logoUrl || "/icon.png"} alt="Logo" className="h-full w-full object-cover" />
                   </div>
                   {/* Text Header */}
                   <div className="text-center flex-1">
@@ -1491,11 +1486,7 @@ export function OperatorSubmenuClient({
                 {/* Logo Upload */}
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-slate-50/70 p-4 rounded-xl border border-dashed border-slate-200">
                   <div className="h-16 w-16 rounded-full border-2 border-primary/30 bg-muted flex items-center justify-center overflow-hidden shadow-md shrink-0 relative">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="h-full w-full object-cover" />
-                    ) : (
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                    )}
+                    <img src={logoUrl || "/icon.png"} alt="Logo" className="h-full w-full object-cover" />
                     {uploading && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-[8px] font-bold rounded-full">Uploading...</div>
                     )}

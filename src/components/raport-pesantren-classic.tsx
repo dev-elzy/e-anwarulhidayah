@@ -119,17 +119,11 @@ export function RaportPesantrenClassic({ data, backUrl = "/dashboard/mustahiq/ni
             {/* Header / Kop Raport */}
             <div>
               <div className="text-center flex flex-col items-center">
-                {data.logoUrl ? (
-                  <img
-                    src={data.logoUrl}
-                    alt="Logo Pesantren"
-                    className="h-16 w-16 object-contain mb-2"
-                  />
-                ) : (
-                  <div className="h-14 w-14 rounded-full border border-slate-800 flex items-center justify-center text-[10px] font-bold mb-2">
-                    شعار
-                  </div>
-                )}
+                <img
+                  src={data.logoUrl || "/icon.png"}
+                  alt="Logo Pesantren"
+                  className="h-16 w-16 object-contain mb-2"
+                />
                 
                 <h1 className="font-arabic text-2xl md:text-3xl font-bold tracking-wide" dir="rtl">
                   كشف الدرجات الدراسية
