@@ -17,7 +17,7 @@ interface UserProfileModalProps {
 
 export function UserProfileModal({ open, onOpenChange }: UserProfileModalProps) {
   const { data: session, update } = useSession();
-  const [username, setUsername] = useState(session?.user?.username || "");
+  const [username, setUsername] = useState((session?.user as any)?.username || session?.user?.name || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,15 +25,16 @@ export function UserProfileModal({ open, onOpenChange }: UserProfileModalProps) 
 
   // Keep username synced when session changes or modal opens
   React.useEffect(() => {
-    if (session?.user?.username) {
-      setUsername(session.user.username);
+    const currentUsername = (session?.user as any)?.username || session?.user?.name || "";
+    if (currentUsername) {
+      setUsername(currentUsername);
     }
     if (open) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     }
-  }, [open, session?.user?.username]);
+  }, [open, session]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +61,11 @@ export function UserProfileModal({ open, onOpenChange }: UserProfileModalProps) 
 
     startTransition(async () => {
       const res = await apiPost("updateSelfProfile", {
-        username: username.trim(),
-        currentPassword: currentPassword || undefined,
-        newPassword: newPassword || undefined,
+        data: {
+          username: username.trim(),
+          currentPassword: currentPassword || undefined,
+          newPassword: newPassword || undefined,
+        }
       });
 
       if (res.error) {

@@ -220,7 +220,7 @@ export function CommandPalette() {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-[4px] transition-opacity duration-200"
+        className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-200"
         onClick={() => setIsOpen(false)}
       />
 
@@ -228,7 +228,7 @@ export function CommandPalette() {
       <div
         ref={containerRef}
         onKeyDown={handleKeyDown}
-        className="relative w-full max-w-lg rounded-2xl border border-border/50 bg-background/95 shadow-2xl backdrop-blur-xl flex flex-col max-h-[450px] overflow-hidden transition-all duration-300 transform scale-100"
+        className="relative w-full max-w-lg rounded-2xl border border-border/50 bg-background/95 shadow-2xl backdrop-blur-xl flex flex-col max-h-112.5 overflow-hidden transition-all duration-300 transform scale-100"
       >
         {/* Search header */}
         <div className="flex items-center gap-2 border-b border-border/40 px-4 py-3 shrink-0">
@@ -250,7 +250,7 @@ export function CommandPalette() {
         </div>
 
         {/* Command list */}
-        <div className="flex-1 overflow-y-auto p-2 min-h-[150px] max-h-[350px]">
+        <div className="flex-1 overflow-y-auto p-2 min-h-37.5 max-h-87.5">
           {filteredCommands.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Compass className="h-8 w-8 text-muted-foreground/60 stroke-[1.5]" />

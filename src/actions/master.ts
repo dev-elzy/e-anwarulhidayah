@@ -25,6 +25,7 @@ import {
   catatanPembelajaran
 } from "@/lib/db/schema";
 import { eq, like, and, or, sql } from "drizzle-orm";
+import { hashPassword, verifyPassword } from "@/utils/crypto";
 
 // Log activity helper
 async function logActivity(userId: string | null, action: string, details: string) {
@@ -422,8 +423,6 @@ export async function deleteUstadz(id: string, operatorId: string) {
 // ==========================================
 // 6. ACCOUNT MANAGEMENT (Operator)
 // ==========================================
-
-import { hashPassword } from "@/utils/crypto";
 
 export async function getUsersWithUstadz() {
   const db = getDb();

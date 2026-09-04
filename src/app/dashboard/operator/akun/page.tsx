@@ -467,7 +467,7 @@ export default function AkunPenggunaPage() {
                           <TableCell className="font-semibold">{item.nama}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">{item.nomorHp}</TableCell>
                           <TableCell>
-                            <div className="flex flex-col gap-1 max-w-[220px]">
+                            <div className="flex flex-col gap-1 max-w-55">
                               {item.santri && item.santri.length > 0 ? (
                                 item.santri.map((s: any) => (
                                   <Badge key={s.id} variant="outline" className="text-xs bg-blue-50/50 truncate py-0.5 justify-start">
