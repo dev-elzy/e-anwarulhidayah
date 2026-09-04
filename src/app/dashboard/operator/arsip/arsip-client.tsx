@@ -208,7 +208,7 @@ export function ArsipClient({
                           <div className="flex items-center justify-center gap-1.5 flex-nowrap">
                             {/* 1. View / Pratinjau Raport di Layar */}
                             <Link 
-                              href={`/dashboard/mustahiq/raport/${s.id}?semesterId=${selectedSemesterId}`}
+                              href={`/dashboard/operator/raport/${s.id}?semesterId=${selectedSemesterId}`}
                             >
                               <Button 
                                 variant="outline" 
@@ -222,7 +222,7 @@ export function ArsipClient({
 
                             {/* 2. PDF Nilai (Transkrip) */}
                             <a 
-                              href={`/dashboard/mustahiq/raport/${s.id}?semesterId=${selectedSemesterId}&mode=nilai&download=true`} 
+                              href={`/dashboard/operator/raport/${s.id}?semesterId=${selectedSemesterId}&mode=nilai&download=true`} 
                               target="_blank" 
                               rel="noopener noreferrer"
                             >
@@ -238,7 +238,7 @@ export function ArsipClient({
 
                             {/* 3. PDF Raport */}
                             <a 
-                              href={`/dashboard/mustahiq/raport/${s.id}?semesterId=${selectedSemesterId}&download=true`} 
+                              href={`/dashboard/operator/raport/${s.id}?semesterId=${selectedSemesterId}&download=true`} 
                               target="_blank" 
                               rel="noopener noreferrer"
                             >

@@ -61,8 +61,17 @@ export default auth((req) => {
   if (nextUrl.pathname.startsWith("/dashboard/pengasuh") && userRole !== "PENGASUH") {
     return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
-  if (nextUrl.pathname.startsWith("/dashboard/mustahiq") && userRole !== "MUSTAHIQ") {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl));
+  if (nextUrl.pathname.startsWith("/dashboard/mustahiq")) {
+    if (nextUrl.pathname.startsWith("/dashboard/mustahiq/raport/")) {
+      const allowedRaportRoles = ["MUSTAHIQ", "OPERATOR", "SUPER_ADMIN", "WALI_SANTRI", "PENGASUH"];
+      if (!allowedRaportRoles.includes(userRole || "")) {
+        return NextResponse.redirect(new URL("/dashboard", nextUrl));
+      }
+    } else if (nextUrl.pathname === "/dashboard/mustahiq/raport" && userRole === "OPERATOR") {
+      return NextResponse.redirect(new URL("/dashboard/operator/arsip", nextUrl));
+    } else if (userRole !== "MUSTAHIQ") {
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
+    }
   }
   if (nextUrl.pathname.startsWith("/dashboard/munawib")) {
     if (nextUrl.pathname.startsWith("/dashboard/munawib/scan") || nextUrl.pathname.startsWith("/dashboard/munawib/absensi")) {
