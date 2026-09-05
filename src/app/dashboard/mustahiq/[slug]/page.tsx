@@ -16,7 +16,7 @@ import {
   semester,
   targetHafalanNadzom
 } from "@/lib/db/schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { MustahiqSubmenuClient } from "./submenu-client";
 import { GraduationCap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -52,7 +52,7 @@ export default async function MustahiqSubmenuPage({
   const classStudents = await db.select().from(santri).where(eq(santri.kelasId, myKelas.id));
   if (classStudents.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] p-6">
+      <div className="flex items-center justify-center min-h-100 p-6">
         <Card className="w-full max-w-md border border-slate-100 bg-white/80 backdrop-blur-md shadow-lg rounded-2xl overflow-hidden">
           <CardContent className="pt-10 pb-8 px-6 flex flex-col items-center text-center">
             <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-6 animate-pulse">
@@ -79,20 +79,27 @@ export default async function MustahiqSubmenuPage({
   const studentIds = classStudents.map((s: any) => s.id);
 
   // Load all required academic and attendance data for these students
-  const attendanceList = await db.select().from(absensiSantri)
-    .where(sql`${absensiSantri.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`)
-    .orderBy(desc(absensiSantri.tanggal));
+  let attendanceList: any[] = [];
+  let gradesList: any[] = [];
+  let setoranList: any[] = [];
+  let notesList: any[] = [];
 
-  const gradesList = await db.select().from(nilaiSantri)
-    .where(sql`${nilaiSantri.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`);
+  if (studentIds.length > 0) {
+    attendanceList = await db.select().from(absensiSantri)
+      .where(inArray(absensiSantri.santriId, studentIds))
+      .orderBy(desc(absensiSantri.tanggal));
 
-  const setoranList = await db.select().from(setoranNadzom)
-    .where(sql`${setoranNadzom.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`)
-    .orderBy(desc(setoranNadzom.tanggal));
+    gradesList = await db.select().from(nilaiSantri)
+      .where(inArray(nilaiSantri.santriId, studentIds));
 
-  const notesList = await db.select().from(catatanSantri)
-    .where(sql`${catatanSantri.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`)
-    .orderBy(desc(catatanSantri.tanggal));
+    setoranList = await db.select().from(setoranNadzom)
+      .where(inArray(setoranNadzom.santriId, studentIds))
+      .orderBy(desc(setoranNadzom.tanggal));
+
+    notesList = await db.select().from(catatanSantri)
+      .where(inArray(catatanSantri.santriId, studentIds))
+      .orderBy(desc(catatanSantri.tanggal));
+  }
 
   const nadzomList = await db.select().from(kitabNadzom);
   const mapelList = await db.select().from(kitabMapel);

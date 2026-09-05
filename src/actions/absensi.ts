@@ -27,6 +27,33 @@ function timeToMinutes(t: string): number {
   return h * 60 + (m || 0);
 }
 
+function getJakartaParts(date: Date = new Date()) {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false
+  });
+  const parts = dtf.formatToParts(date);
+  const partMap: Record<string, string> = {};
+  for (const p of parts) {
+    partMap[p.type] = p.value;
+  }
+  let hour = parseInt(partMap.hour || '0', 10);
+  if (hour === 24) hour = 0;
+  const minute = parseInt(partMap.minute || '0', 10);
+  const second = parseInt(partMap.second || '0', 10);
+  const year = parseInt(partMap.year || '2026', 10);
+  const month = parseInt(partMap.month || '1', 10);
+  const day = parseInt(partMap.day || '1', 10);
+
+  return { year, month, day, hour, minute, second };
+}
+
 export async function processClassScan({ kelasId, ustadzId }: ScanParams) {
   const db = getDb();
   if (!db) {
@@ -34,35 +61,12 @@ export async function processClassScan({ kelasId, ustadzId }: ScanParams) {
   }
 
   try {
-    // Get current Jakarta time & date
-    const currentDate = new Date();
-    const jktTimeStr = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Jakarta',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(currentDate);
-    
-    // Parse jktTimeStr (MM/DD/YYYY, HH:mm:ss)
-    // Note: format varies by node version, but en-US is strictly MM/DD/YYYY, HH:mm:ss
-    const [datePart, timePart] = jktTimeStr.split(', ');
-    const [month, day, year] = datePart.split('/');
-    const [nowHourStr, nowMinStr] = timePart.split(':');
-    
-    // Some node versions use 24 for midnight, fix it:
-    let nowHour = parseInt(nowHourStr);
-    if (nowHour === 24) nowHour = 0;
-    
-    const nowMin = parseInt(nowMinStr);
+    const { year, month, day, hour: nowHour, minute: nowMin } = getJakartaParts();
     const nowMinutes = nowHour * 60 + nowMin;
     const nowTimeStr = `${String(nowHour).padStart(2, '0')}:${String(nowMin).padStart(2, '0')}:00`;
 
     // Create a date object representing local Jakarta time
-    const jktDateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const jktDateObj = new Date(year, month - 1, day);
 
     // Shift date if >= 18:00 (Pesantren Logic: Maghrib shifts day to tomorrow)
     if (nowHour >= 18) {
@@ -267,25 +271,9 @@ export async function saveStudentsAttendance(
 
   try {
     // Get current Jakarta time & date
-    const currentDate = new Date();
-    const jktTimeStr = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Jakarta',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(currentDate);
-    
-    const [datePart, timePart] = jktTimeStr.split(', ');
-    const [month, day, year] = datePart.split('/');
-    const [nowHourStr] = timePart.split(':');
-    let nowHour = parseInt(nowHourStr);
-    if (nowHour === 24) nowHour = 0;
+    const { year, month, day, hour: nowHour } = getJakartaParts();
 
-    const jktDateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const jktDateObj = new Date(year, month - 1, day);
     if (nowHour >= 18) {
       jktDateObj.setDate(jktDateObj.getDate() + 1);
     }

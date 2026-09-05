@@ -27,7 +27,11 @@ type LoginFormValues = zod.infer<typeof loginSchema>;
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const rawCallbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  // Prevent open redirect: must be an internal relative path starting with single '/'
+  const callbackUrl = (rawCallbackUrl.startsWith("/") && !rawCallbackUrl.startsWith("//") && !rawCallbackUrl.includes("://"))
+    ? rawCallbackUrl
+    : "/dashboard";
   const [loading, setLoading] = useState(false);
   const { status } = useSession();
 

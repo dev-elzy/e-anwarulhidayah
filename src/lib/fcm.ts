@@ -34,6 +34,7 @@ function stringToBase64Url(str: string): string {
 // Convert PEM PKCS#8 private key into ArrayBuffer
 function pemToArrayBuffer(pem: string): ArrayBuffer {
   const cleanPem = pem
+    .replace(/\\n/g, "\n")
     .replace(/-----BEGIN PRIVATE KEY-----/, "")
     .replace(/-----END PRIVATE KEY-----/, "")
     .replace(/\s/g, "");
@@ -46,13 +47,21 @@ function pemToArrayBuffer(pem: string): ArrayBuffer {
   return buffer.buffer;
 }
 
+let cachedAccessToken: string | null = null;
+let tokenExpiresAt = 0;
+
 // Generate Google Access Token using Service Account JWT Assertion
 async function getGoogleAccessToken(
   clientEmail: string,
   privateKeyPem: string
 ): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  if (cachedAccessToken && tokenExpiresAt > now + 60) {
+    return cachedAccessToken;
+  }
+
   const tokenUri = "https://oauth2.googleapis.com/token";
-  const iat = Math.floor(Date.now() / 1000);
+  const iat = now;
   const exp = iat + 3600; // 1 hour expiration
 
   const header = {
@@ -113,7 +122,9 @@ async function getGoogleAccessToken(
     throw new Error(`Google OAuth token exchange failed: ${errorText}`);
   }
 
-  const result = (await response.json()) as { access_token: string };
+  const result = (await response.json()) as { access_token: string; expires_in?: number };
+  cachedAccessToken = result.access_token;
+  tokenExpiresAt = now + (result.expires_in || 3600);
   return result.access_token;
 }
 

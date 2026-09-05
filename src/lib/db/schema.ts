@@ -34,7 +34,7 @@ export const users = pgTable('users', {
   active: boolean('active').default(true).notNull(),
   mustChangePassword: boolean('must_change_password').default(false).notNull(),
   fcmToken: text('fcm_token'),
-  createdAt: text('created_at').default(new Date().toISOString()).notNull(),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()).notNull(),
 });
 
 // Tahun Ajaran
@@ -158,7 +158,7 @@ export const jadwal = pgTable('jadwal', {
 export const qrKelas = pgTable('qr_kelas', {
   id: text('id').primaryKey(), // QR Code String (e.g. 'QR-IDA-A')
   kelasId: text('kelas_id').notNull().references(() => kelas.id),
-  updatedAt: text('updated_at').default(new Date().toISOString()).notNull(),
+  updatedAt: text('updated_at').$defaultFn(() => new Date().toISOString()).notNull(),
 });
 
 // Class Sessions (Sesi Kelas)
@@ -315,7 +315,7 @@ export const notifications = pgTable('notifications', {
   message: text('message').notNull(),
   type: text('type').notNull(),
   isRead: boolean('is_read').default(false).notNull(),
-  createdAt: text('created_at').default(new Date().toISOString()).notNull(),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()).notNull(),
 });
 
 // Audit Logs
@@ -325,7 +325,7 @@ export const auditLogs = pgTable('audit_logs', {
   action: text('action').notNull(),
   details: text('details').notNull(),
   ipAddress: text('ip_address'),
-  timestamp: text('timestamp').default(new Date().toISOString()).notNull(),
+  timestamp: text('timestamp').$defaultFn(() => new Date().toISOString()).notNull(),
 });
 
 // Relations

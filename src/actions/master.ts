@@ -472,6 +472,11 @@ export async function createUstadzAccount(
   customUsername?: string,
   customPassword?: string
 ) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "OPERATOR" && session.user.role !== "SUPER_ADMIN")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk membuat akun ustadz." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
   try {
@@ -530,6 +535,11 @@ export async function createUstadzAccount(
 }
 
 export async function createWaliAccount(waliId: string, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "OPERATOR" && session.user.role !== "SUPER_ADMIN")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk membuat akun wali." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
   try {
@@ -590,6 +600,11 @@ export async function createWaliAccount(waliId: string, operatorId: string) {
 }
 
 export async function resetUserPassword(userId: string, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "OPERATOR" && session.user.role !== "SUPER_ADMIN")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk mereset password." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
   try {
@@ -636,6 +651,11 @@ export async function updateUserAccount(
   data: { username?: string; roleId?: string; password?: string; active?: boolean },
   operatorId: string
 ) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "OPERATOR" && session.user.role !== "SUPER_ADMIN")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk mengubah akun pengguna." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
   try {
@@ -837,6 +857,11 @@ export async function importSantri(rows: any[], operatorId: string) {
 }
 
 export async function autoGenerateAccounts(operatorId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "OPERATOR" && session.user.role !== "SUPER_ADMIN")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk mengenerate akun." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung." };
 

@@ -20,7 +20,11 @@ import {
   nilaiSantri,
   settings
 } from "@/lib/db/schema";
-import { count, eq, and, sql, desc } from "drizzle-orm";
+import { count, eq, and, sql, desc, inArray } from "drizzle-orm";
+
+function getJakartaTodayStr(): string {
+  return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+}
 
 // 1. Operator Stats
 export async function getOperatorDashboardStats() {
@@ -33,7 +37,7 @@ export async function getOperatorDashboardStats() {
   if (!db) return null;
 
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getJakartaTodayStr();
     
     // Concurrent parallel counts in a single network round-trip
     const [
@@ -83,7 +87,7 @@ export async function getPengasuhDashboardStats() {
   if (!db) return null;
 
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getJakartaTodayStr();
 
     // Concurrent parallel queries in a single network round-trip
     const [
@@ -190,6 +194,10 @@ export async function getWaliDashboardStats(waliId: string) {
     const systemSettings = await db.select().from(settings).limit(1);
     const activeSemesterId = systemSettings[0]?.semesterAktifId || null;
 
+    // Fetch master kitabs once outside the loop to prevent N+1 queries
+    const allNads = await db.select().from(kitabNadzom);
+    const today = getJakartaTodayStr();
+
     const childDataList = [];
 
     for (const child of children) {
@@ -198,7 +206,6 @@ export async function getWaliDashboardStats(waliId: string) {
       const childKamar = child.kamarId ? await db.select().from(kamar).where(eq(kamar.id, child.kamarId)).limit(1) : [];
 
       // Get attendance count
-      const today = new Date().toISOString().split("T")[0];
       const childTodayAbsensi = await db.select().from(absensiSantri)
         .where(and(eq(absensiSantri.santriId, child.id), eq(absensiSantri.tanggal, today))).limit(1);
 
@@ -225,7 +232,6 @@ export async function getWaliDashboardStats(waliId: string) {
       }));
 
       // Calculate overall progress pct
-      const allNads = await db.select().from(kitabNadzom);
       const childSetorans = await db.select().from(setoranNadzom).where(eq(setoranNadzom.santriId, child.id));
       const highestSetorans: Record<string, number> = {};
       for (const s of childSetorans) {
@@ -299,7 +305,7 @@ export async function getMustahiqDashboardStats(ustadzId: string) {
   if (!db) return null;
 
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getJakartaTodayStr();
 
     // Find class perwalian
     const kelasList = await db.select().from(kelas).where(eq(kelas.waliKelasId, ustadzId)).limit(1);
@@ -330,7 +336,7 @@ export async function getMustahiqDashboardStats(ustadzId: string) {
     // Get today's attendance for these students
     const attendance = await db.select().from(absensiSantri)
       .where(and(
-        sql`${absensiSantri.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`,
+        inArray(absensiSantri.santriId, studentIds),
         eq(absensiSantri.tanggal, today)
       ));
 
@@ -344,7 +350,7 @@ export async function getMustahiqDashboardStats(ustadzId: string) {
     const grades = await db.select({
       nilai: nilaiSantri.nilai
     }).from(nilaiSantri)
-      .where(sql`${nilaiSantri.santriId} IN (${sql.join(studentIds.map((id: string) => sql`${id}`), sql`, `)})`);
+      .where(inArray(nilaiSantri.santriId, studentIds));
 
     const totalGrades = grades.reduce((acc: number, curr: any) => acc + curr.nilai, 0);
     const kelasRataRata = grades.length > 0 ? parseFloat((totalGrades / grades.length).toFixed(1)) : 0;
@@ -353,14 +359,24 @@ export async function getMustahiqDashboardStats(ustadzId: string) {
     // Get master kitabs to know total bait
     const nadzoms = await db.select().from(kitabNadzom);
     
-    // Get last setoran for each student to calculate progress
+    // Batch query: Get all setorans for all students in this class in ONE single network round-trip
+    const allClassSetorans = await db.select().from(setoranNadzom)
+      .where(inArray(setoranNadzom.santriId, studentIds))
+      .orderBy(desc(setoranNadzom.baitSelesai));
+
+    const studentSetoransMap = new Map<string, any[]>();
+    for (const set of allClassSetorans) {
+      if (!studentSetoransMap.has(set.santriId)) {
+        studentSetoransMap.set(set.santriId, []);
+      }
+      studentSetoransMap.get(set.santriId)!.push(set);
+    }
+
     let totalProgressPct = 0;
     let studentSetoranCount = 0;
 
     for (const sId of studentIds) {
-      const studentSetorans = await db.select().from(setoranNadzom)
-        .where(eq(setoranNadzom.santriId, sId))
-        .orderBy(desc(setoranNadzom.baitSelesai)); // Get highest bait setoran
+      const studentSetorans = studentSetoransMap.get(sId) || [];
       
       if (studentSetorans.length > 0) {
         // Find highest setoran per nadzom

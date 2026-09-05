@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'e-AnwarulHidayah',
   webDir: 'public',
   server: {
-    url: 'https://e-anwarulhidayah.develzy.workers.dev/',
+    url: 'https://anwarulhidayah.develzy.my.id/',
     cleartext: true
   },
   plugins: {

@@ -17,15 +17,17 @@ CREATE TABLE IF NOT EXISTS permissions (
 );
 
 CREATE TABLE IF NOT EXISTS role_permissions (
+    id TEXT PRIMARY KEY,
     role_id TEXT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-    permission_id TEXT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
-    PRIMARY KEY (role_id, permission_id)
+    permission_id TEXT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE
 );
 
 -- 2. Master Tahun Ajaran & Semester
 CREATE TABLE IF NOT EXISTS tahun_ajaran (
     id TEXT PRIMARY KEY,
     nama TEXT NOT NULL,
+    tanggal_mulai TEXT NOT NULL,
+    tanggal_selesai TEXT NOT NULL,
     aktif BOOLEAN NOT NULL DEFAULT FALSE
 );
 
@@ -272,6 +274,7 @@ CREATE TABLE IF NOT EXISTS users (
     wali_id TEXT REFERENCES wali_santri(id) ON DELETE SET NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
+    fcm_token TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

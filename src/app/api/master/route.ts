@@ -106,99 +106,224 @@ export async function POST(request: NextRequest) {
   }
 
   const userId = session.user.id || "";
+  const userRole = session.user.role || "";
   const body = await request.json() as any;
   const { action, data, id, params } = body;
+
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const isOperatorOrAdmin = userRole === "SUPER_ADMIN" || userRole === "OPERATOR";
+  const isMustahiqOrAbove = ["SUPER_ADMIN", "OPERATOR", "MUSTAHIQ"].includes(userRole);
+  const isMunawibOrAbove = ["SUPER_ADMIN", "OPERATOR", "MUSTAHIQ", "MUNAWIB"].includes(userRole);
 
   try {
     let result: any;
 
     switch (action) {
-      // ── Santri ──
-      case "createSantri":    result = await createSantri(data, userId); break;
-      case "updateSantri":    result = await updateSantri(id, data, userId); break;
-      case "deleteSantri":    result = await deleteSantri(id, userId); break;
-      case "importSantri":    result = await importSantri(data, userId); break;
-      case "changeSantriStatus": result = await changeSantriStatus(id, params.status, params.tahunKeluar, userId); break;
-
-      // ── Ustadz ──
-      case "createUstadz":   result = await createUstadz(data, userId); break;
-      case "updateUstadz":   result = await updateUstadz(id, data, userId); break;
-      case "deleteUstadz":   result = await deleteUstadz(id, userId); break;
-
-      // ── Kelas ──
-      case "createKelas":    result = await createKelas(data, userId); break;
-      case "updateKelas":    result = await updateKelas(id, data, userId); break;
-      case "deleteKelas":    result = await deleteKelas(id, userId); break;
-
-      // ── Kamar ──
-      case "createKamar":    result = await createKamar(data, userId); break;
-      case "updateKamar":    result = await updateKamar(id, data, userId); break;
-      case "deleteKamar":    result = await deleteKamar(id, userId); break;
-
-      // ── Kitab / Mapel ──
-      case "createKitab":    result = await createKitab(data, userId); break;
-      case "updateKitab":    result = await updateKitab(id, data, userId); break;
-      case "deleteKitab":    result = await deleteKitab(id, userId); break;
-
-      // ── Jadwal ──
-      case "createJadwal":   result = await createJadwal(data, userId); break;
-      case "updateJadwal":   result = await updateJadwal(id, data, userId); break;
-      case "deleteJadwal":   result = await deleteJadwal(id, userId); break;
-
-      // ── Pengumuman ──
-      case "createPengumuman": result = await createPengumuman(data, userId); break;
-      case "deletePengumuman": result = await deletePengumuman(id, userId); break;
-
-      // ── Akun ──
-      case "createUstadzAccount":
-        result = await createUstadzAccount(params.ustadzId, params.roleId, userId, params.username, params.password);
+      // ── Super Admin Only ──
+      case "createUser":
+        if (!isSuperAdmin) return NextResponse.json({ error: "Akses ditolak: Hanya Super Admin." }, { status: 403 });
+        result = await createUser(data, userId);
         break;
-      case "createWaliAccount":
-        result = await createWaliAccount(params.waliId, userId);
+      case "deleteUser":
+        if (!isSuperAdmin) return NextResponse.json({ error: "Akses ditolak: Hanya Super Admin." }, { status: 403 });
+        result = await deleteUser(id, userId);
         break;
-      case "updateUserAccount":
-        result = await updateUserAccount(id, data, userId);
+      case "updateSystemSettings":
+        if (!isSuperAdmin) return NextResponse.json({ error: "Akses ditolak: Hanya Super Admin." }, { status: 403 });
+        result = await updateSystemSettings(data, userId);
         break;
-      case "updateSelfProfile":
-        result = await updateSelfProfile(userId, data);
-        break;
-      case "resetUserPassword":   result = await resetUserPassword(id, userId); break;
-      case "autoGenerateAccounts": result = await autoGenerateAccounts(userId); break;
-      case "createUser":          result = await createUser(data, userId); break;
-      case "deleteUser":          result = await deleteUser(id, userId); break;
-      case "updateSystemSettings": result = await updateSystemSettings(data, userId); break;
       case "updateRolePermissions":
+        if (!isSuperAdmin) return NextResponse.json({ error: "Akses ditolak: Hanya Super Admin." }, { status: 403 });
         result = await updateRolePermissions(params.roleId, params.permissionIds, userId);
         break;
 
-      // ── Nilai ──
-      case "createNilai":    result = await createNilai(data, userId); break;
-      case "deleteNilai":    result = await deleteNilai(id, userId); break;
-      case "saveGradesBatch": result = await saveGradesBatch(data, userId); break;
+      // ── Operator & Super Admin ──
+      case "createSantri":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createSantri(data, userId);
+        break;
+      case "updateSantri":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateSantri(id, data, userId);
+        break;
+      case "deleteSantri":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteSantri(id, userId);
+        break;
+      case "importSantri":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await importSantri(data, userId);
+        break;
+      case "changeSantriStatus":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await changeSantriStatus(id, params.status, params.tahunKeluar, userId);
+        break;
 
-      // ── Catatan ──
-      case "createCatatan":  result = await createCatatan(data, userId); break;
-      case "deleteCatatan":  result = await deleteCatatan(id, userId); break;
+      case "createUstadz":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createUstadz(data, userId);
+        break;
+      case "updateUstadz":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateUstadz(id, data, userId);
+        break;
+      case "deleteUstadz":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteUstadz(id, userId);
+        break;
 
-      // ── Setoran Nadzom ──
-      case "createSetoranNadzom": result = await createSetoranNadzom(data, userId); break;
-      case "deleteSetoranNadzom": result = await deleteSetoranNadzom(id, userId); break;
+      case "createKelas":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createKelas(data, userId);
+        break;
+      case "updateKelas":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateKelas(id, data, userId);
+        break;
+      case "deleteKelas":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteKelas(id, userId);
+        break;
 
-      // ── Kitab Nadzom ──
-      case "createKitabNadzom": result = await createKitabNadzom(data, userId); break;
-      case "updateKitabNadzom": result = await updateKitabNadzom(id, data, userId); break;
-      case "deleteKitabNadzom": result = await deleteKitabNadzom(id, userId); break;
+      case "createKamar":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createKamar(data, userId);
+        break;
+      case "updateKamar":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateKamar(id, data, userId);
+        break;
+      case "deleteKamar":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteKamar(id, userId);
+        break;
 
-      // ── Target Hafalan ──
-      case "createTargetHafalan": result = await createTargetHafalan(data, userId); break;
-      case "updateTargetHafalan": result = await updateTargetHafalan(id, data, userId); break;
-      case "deleteTargetHafalan": result = await deleteTargetHafalan(id, userId); break;
+      case "createKitab":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createKitab(data, userId);
+        break;
+      case "updateKitab":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateKitab(id, data, userId);
+        break;
+      case "deleteKitab":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteKitab(id, userId);
+        break;
 
-      // ── Wali Santri ──
-      case "createWali": result = await createWali(data, userId); break;
+      case "createJadwal":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createJadwal(data, userId);
+        break;
+      case "updateJadwal":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateJadwal(id, data, userId);
+        break;
+      case "deleteJadwal":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteJadwal(id, userId);
+        break;
 
-      // ── Absensi ──
+      case "createPengumuman":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createPengumuman(data, userId);
+        break;
+      case "deletePengumuman":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deletePengumuman(id, userId);
+        break;
+
+      case "createUstadzAccount":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createUstadzAccount(params.ustadzId, params.roleId, userId, params.username, params.password);
+        break;
+      case "createWaliAccount":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createWaliAccount(params.waliId, userId);
+        break;
+      case "updateUserAccount":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateUserAccount(id, data, userId);
+        break;
+      case "resetUserPassword":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await resetUserPassword(id, userId);
+        break;
+      case "autoGenerateAccounts":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await autoGenerateAccounts(userId);
+        break;
+      case "createWali":
+        if (!isOperatorOrAdmin) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createWali(data, userId);
+        break;
+
+      // ── Self Profile Update ──
+      case "updateSelfProfile":
+        result = await updateSelfProfile(userId, data);
+        break;
+
+      // ── Nilai, Catatan, Hafalan (Mustahiq / Operator / Super Admin) ──
+      case "createNilai":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createNilai(data, userId);
+        break;
+      case "deleteNilai":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteNilai(id, userId);
+        break;
+      case "saveGradesBatch":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await saveGradesBatch(data, userId);
+        break;
+
+      case "createCatatan":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createCatatan(data, userId);
+        break;
+      case "deleteCatatan":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteCatatan(id, userId);
+        break;
+
+      case "createSetoranNadzom":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createSetoranNadzom(data, userId);
+        break;
+      case "deleteSetoranNadzom":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteSetoranNadzom(id, userId);
+        break;
+
+      case "createKitabNadzom":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createKitabNadzom(data, userId);
+        break;
+      case "updateKitabNadzom":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateKitabNadzom(id, data, userId);
+        break;
+      case "deleteKitabNadzom":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteKitabNadzom(id, userId);
+        break;
+
+      case "createTargetHafalan":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await createTargetHafalan(data, userId);
+        break;
+      case "updateTargetHafalan":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await updateTargetHafalan(id, data, userId);
+        break;
+      case "deleteTargetHafalan":
+        if (!isMustahiqOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
+        result = await deleteTargetHafalan(id, userId);
+        break;
+
+      // ── Absensi (Munawib / Mustahiq / Operator / Super Admin) ──
       case "saveStudentsAttendance":
+        if (!isMunawibOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
         result = await saveStudentsAttendance(
           params.sessionId,
           params.records,
@@ -208,6 +333,7 @@ export async function POST(request: NextRequest) {
         );
         break;
       case "processClassScan":
+        if (!isMunawibOrAbove) return NextResponse.json({ error: "Akses ditolak." }, { status: 403 });
         result = await processClassScan({
           kelasId: params.kelasId,
           ustadzId: params.ustadzId

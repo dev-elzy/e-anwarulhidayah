@@ -93,6 +93,12 @@ export default async function RaportDetailPage({ params, searchParams }: PagePro
   }
 
   const activeStudent = studentData[0];
+
+  // Prevent IDOR: Wali Santri may only view raport for their own children
+  if (session.user.role === "WALI_SANTRI" && activeStudent.waliId !== session.user.waliId) {
+    redirect("/dashboard/wali");
+  }
+
   const classId = activeStudent.kelasId || "NONE";
 
   // 2. Fetch Settings

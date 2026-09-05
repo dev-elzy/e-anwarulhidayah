@@ -14,7 +14,7 @@
     {
       "binding": "HYPERDRIVE",
       "id": "c63805c58ef9480295346cd7f0feaaee",
-      "localConnectionString": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+      "localConnectionString": "postgres://postgres.ylmddkafujvmilaticrm:[DB_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
     }
   ],
   "routes": [
@@ -24,14 +24,9 @@
     }
   ],
   "vars": {
-    "DATABASE_URL": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true",
-    "DIRECT_URL": "postgres://postgres.ylmddkafujvmilaticrm:Muh4mm4dkhul4l.@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres",
     "SUPABASE_URL": "https://ylmddkafujvmilaticrm.supabase.co",
     "NEXT_PUBLIC_SUPABASE_URL": "https://ylmddkafujvmilaticrm.supabase.co",
-    "AUTH_SECRET": "e-anwarulhidayah-super-secret-key-development-2026-local",
-    "NEXTAUTH_SECRET": "e-anwarulhidayah-super-secret-key-development-2026-local",
-    "NEXTAUTH_URL": "https://anwarulhidayah.develzy.my.id",
-    "CRON_SECRET": "cron-local-secret-key-2026"
+    "NEXTAUTH_URL": "https://anwarulhidayah.develzy.my.id"
   },
   "observability": {
     "enabled": false,

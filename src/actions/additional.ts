@@ -1,6 +1,7 @@
 "use server";
 
 import { getDb } from "@/lib/db";
+import { auth } from "@/auth";
 import { 
   users, 
   roles, 
@@ -119,6 +120,11 @@ export async function getSemesterList() {
 }
 
 export async function updateSystemSettings(data: any, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    return { error: "Akses ditolak: Hanya Super Admin yang dapat mengubah pengaturan sistem." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {
@@ -183,6 +189,11 @@ export async function getUsersList() {
 }
 
 export async function createUser(data: any, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    return { error: "Akses ditolak: Hanya Super Admin yang dapat menambahkan user baru." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {
@@ -215,6 +226,11 @@ export async function createUser(data: any, operatorId: string) {
 }
 
 export async function deleteUser(id: string, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    return { error: "Akses ditolak: Hanya Super Admin yang dapat menghapus user." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {
@@ -234,6 +250,11 @@ export async function deleteUser(id: string, operatorId: string) {
 }
 
 export async function updateUserStatus(id: string, active: boolean, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    return { error: "Akses ditolak: Hanya Super Admin yang dapat mengubah status user." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {
@@ -246,6 +267,11 @@ export async function updateUserStatus(id: string, active: boolean, operatorId: 
 }
 
 export async function resetUserPassword(id: string, newPassword: string, operatorId: string) {
+  const session = await auth();
+  if (!session?.user || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "OPERATOR")) {
+    return { error: "Akses ditolak: Anda tidak memiliki izin untuk mereset password." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {
@@ -289,6 +315,11 @@ export async function getRolePermissionsList() {
 }
 
 export async function updateRolePermissions(roleId: string, permissionIds: string[], operatorId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "SUPER_ADMIN") {
+    return { error: "Akses ditolak: Hanya Super Admin yang dapat mengubah hak akses peran." };
+  }
+
   const db = getDb();
   if (!db) return { error: "Database tidak terhubung" };
   try {

@@ -51,10 +51,13 @@ export function NativeBridgeProvider({ children }: { children: React.ReactNode }
           return;
         }
 
-        // 2. Register for push notifications (Triggers registration listener)
+        // 2. Clear existing listeners before registering new ones to prevent duplicate handlers
+        await PushNotifications.removeAllListeners();
+
+        // 3. Register for push notifications (Triggers registration listener)
         await PushNotifications.register();
 
-        // 3. Set up listeners
+        // 4. Set up listeners
         await PushNotifications.addListener("registration", async (token) => {
           console.log("FCM registration success, token obtained.");
           
