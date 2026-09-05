@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "e-anwarulhidayah",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2024-11-01",
+  "compatibility_date": "2025-02-04",
   "compatibility_flags": [
     "nodejs_compat"
   ],
@@ -13,8 +13,7 @@
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "c63805c58ef9480295346cd7f0feaaee",
-      "localConnectionString": "postgres://postgres.ylmddkafujvmilaticrm:[DB_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+      "id": "c63805c58ef9480295346cd7f0feaaee"
     }
   ],
   "routes": [
@@ -29,7 +28,7 @@
     "NEXTAUTH_URL": "https://anwarulhidayah.develzy.my.id"
   },
   "observability": {
-    "enabled": false,
+    "enabled": true,
     "head_sampling_rate": 1,
     "logs": {
       "enabled": true,
