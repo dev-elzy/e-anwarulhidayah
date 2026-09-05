@@ -16,7 +16,7 @@ import {
   rekapAbsensiBulanHijriah,
   jadwal
 } from "@/lib/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { RaportPesantrenClassic } from "@/components/raport-pesantren-classic";
 
 interface PageProps {
@@ -41,19 +41,21 @@ function getHijriYear(gregorian: string) {
   return "١٤٤٧ - ١٤٤٨";
 }
 
-function getPredikatBayan(rataRata: number, rank: number) {
-  if (rank === 1) return "المتوسط الأول";
-  if (rank === 2) return "المتوسط الثاني";
-  if (rank === 3) return "المتوسط الثالث";
-  if (rataRata >= 85) return "ممتاز (Mumtaz)";
-  if (rataRata >= 75) return "جيد جدا (Jayyid Jiddan)";
-  if (rataRata >= 60) return "جيد (Jayyid)";
-  return "مقبول (Maqbul)";
+function getPredikatBayan(rataRata: number): string {
+  // Normalisasi jika skala nilai menggunakan 0-100 (misal 85 -> 8.5)
+  const val = rataRata > 10 ? rataRata / 10 : rataRata;
+
+  if (val >= 8.5) return "جيد الأولى";
+  if (val >= 6.5) return "جيد الثاني";
+  if (val >= 5.5) return "المتوسط الأولى";
+  if (val >= 4.0) return "المتوسط الثاني";
+  return "رديء";
 }
 
 function getAkhlaqHuruf(nilaiRata: number) {
-  if (nilaiRata >= 85) return "أ";
-  if (nilaiRata >= 70) return "ج";
+  const val = nilaiRata > 10 ? nilaiRata / 10 : nilaiRata;
+  if (val >= 8.5) return "أ";
+  if (val >= 6.5) return "ج";
   return "م";
 }
 
@@ -255,39 +257,8 @@ export default async function RaportDetailPage({ params, searchParams }: PagePro
   const finalIzin = countDailyIzin + totalMonthlySakit + totalMonthlyIzin;
   const finalAlpha = countDailyAlpha + totalMonthlyAlpha;
 
-  // 6. Calculate Ranking / Predikat Bayan
-  let classRank = 1;
-  if (activeSettings.tampilkanRanking && classId !== "NONE") {
-    const classStudents = await db.select({ id: santri.id }).from(santri).where(eq(santri.kelasId, classId));
-    const classStudentIds = classStudents.map((s: any) => s.id);
-
-    if (classStudentIds.length > 0) {
-      const allClassGrades = await db.select({
-        santriId: nilaiSantri.santriId,
-        nilai: nilaiSantri.nilai
-      })
-      .from(nilaiSantri)
-      .where(and(
-        inArray(nilaiSantri.santriId, classStudentIds),
-        eq(nilaiSantri.semesterId, activeSemesterId),
-        eq(nilaiSantri.tahunAjaranId, activeYearId)
-      ));
-
-      const scores = classStudentIds.map((sid: string) => {
-        const sg = allClassGrades.filter((g: any) => g.santriId === sid);
-        const tot = sg.reduce((s: number, g: any) => s + g.nilai, 0);
-        return { sid, avg: sg.length > 0 ? tot / sg.length : 0 };
-      });
-
-      scores.sort((a: any, b: any) => b.avg - a.avg);
-      const idx = scores.findIndex((s: any) => s.sid === studentId);
-      if (idx !== -1) {
-        classRank = idx + 1;
-      }
-    }
-  }
-
-  const predikatBayan = getPredikatBayan(averageGrade, classRank);
+  // 6. Calculate Predikat Bayan & Nilai Akhlaq
+  const predikatBayan = getPredikatBayan(averageGrade);
   const nilaiAkhlaqHuruf = getAkhlaqHuruf(averageGrade);
 
   const backUrl = session.user.role === "WALI_SANTRI" 
