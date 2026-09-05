@@ -212,7 +212,7 @@ export async function getUstadzList() {
   }
 }
 
-export function generateUstadzUsername(fullName: string): string {
+export async function generateUstadzUsername(fullName: string): Promise<string> {
   if (!fullName) return "ustadz";
   
   // 1. Remove title prefixes & honorifics
@@ -491,7 +491,7 @@ export async function createUstadzAccount(
         return { error: `Username "${username}" sudah digunakan pengguna lain. Silakan pilih username lain.` };
       }
     } else {
-      const baseUsername = generateUstadzUsername(u[0].nama);
+      const baseUsername = await generateUstadzUsername(u[0].nama);
       username = baseUsername;
       let count = 1;
       while (true) {
@@ -856,15 +856,8 @@ export async function autoGenerateAccounts(operatorId: string) {
     for (const u of allUstadz) {
       if (!existingUstadzIds.has(u.id)) {
         const roleId = waliKelasIds.has(u.id) ? "MUSTAHIQ" : "MUNAWIB";
-
-        let baseUsername = u.nama.toLowerCase()
-          .replace(/^(ust\.\s*|ustadz\s*)/, "")
-          .replace(/[^a-z0-9]/g, "");
+        const baseUsername = await generateUstadzUsername(u.nama);
         
-        if (!baseUsername) {
-          baseUsername = "ustadz";
-        }
-
         let username = baseUsername;
         let suffix = 1;
         while (true) {
